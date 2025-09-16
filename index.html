@@ -18,67 +18,57 @@
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, "Apple Color Emoji", "Segoe UI Emoji";
-      color:var(--text); background:linear-gradient(135deg, hsl(210 50% 97%), hsl(260 50% 98%));
-    }
-    .container{max-width:980px; margin:40px auto; padding:0 16px}
-    .header{display:flex; gap:12px; align-items:center; margin-bottom:24px}
-    .logo{display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:white; font-weight:800; box-shadow:var(--shadow)}
-    h1{font-size:clamp(1.25rem, 1rem + 1.2vw, 1.8rem); margin:0}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica; color:var(--text);background:linear-gradient(135deg, hsl(210 50% 97%), hsl(260 50% 98%));}
+    .container{max-width:980px;margin:40px auto;padding:0 16px}
+    .header{display:flex;gap:12px;align-items:center;margin-bottom:24px}
+    .logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;font-weight:800;box-shadow:var(--shadow)}
+    h1{font-size:clamp(1.25rem, 1rem + 1.2vw, 1.8rem);margin:0}
     .muted{color:var(--muted)}
 
-    .card{background:var(--card); border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow)}
-    .grid{display:grid; gap:20px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:20px}
 
     .form-wrap{padding:24px}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-    .row-3{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px}
-    .row-1{display:grid; grid-template-columns:1fr; gap:16px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .row-1{display:grid;grid-template-columns:1fr;gap:16px}
 
-    label{font-size:.9rem; font-weight:600; color:var(--muted)}
-    input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="url"]{
-      width:100%; padding:12px 14px; font-size:1rem; border-radius:12px; border:1px solid var(--border); background:#fff; outline:none; transition:.15s ease; box-shadow: inset 0 0 0 0 transparent;
-    }
-    textarea{min-height:96px; resize:vertical}
-    input:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 6px var(--ring)}
+    label{font-size:.9rem;font-weight:600;color:var(--muted)}
+    input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="url"]{width:100%;padding:12px 14px;font-size:1rem;border-radius:12px;border:1px solid var(--border);background:#fff;outline:none;transition:.15s ease;box-shadow:inset 0 0 0 0 transparent}
+    textarea{min-height:96px;resize:vertical}
+    input:focus, textarea:focus{border-color:var(--accent);box-shadow:0 0 0 6px var(--ring)}
 
-    .file-input{display:flex; align-items:center; gap:12px; padding:14px; border:1px dashed var(--border); border-radius:12px; background:hsl(0 0% 100% / .8)}
+    .file-input{display:flex;align-items:center;gap:12px;padding:14px;border:1px dashed var(--border);border-radius:12px;background:hsl(0 0% 100% / .8)}
     .file-input input{all:unset}
-    .file-input button{padding:8px 12px; border-radius:10px; border:1px solid var(--border); background:linear-gradient(180deg,#fff,hsl(0 0% 98%)); cursor:pointer}
+    .file-input button{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:linear-gradient(180deg,#fff,hsl(0 0% 98%));cursor:pointer}
 
-    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:8px}
-    .btn{appearance:none; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; box-shadow:var(--shadow)}
-    .btn.primary{color:white; background:linear-gradient(135deg,var(--accent),var(--accent-2))}
-    .btn.secondary{background:#fff; border:1px solid var(--border)}
-    .btn.link{background:transparent; color:var(--accent); padding:10px 0}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+    .btn{appearance:none;border:none;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:700;box-shadow:var(--shadow)}
+    .btn.primary{color:white;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+    .btn.secondary{background:#fff;border:1px solid var(--border)}
+    .btn.link{background:transparent;color:var(--accent);padding:10px 0}
 
-    .output{padding:20px; border-top:1px dashed var(--border); background:hsl(0 0% 98% / .6); border-bottom-left-radius:20px; border-bottom-right-radius:20px}
-    .output code{display:block; padding:12px; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:auto}
+    .output{padding:20px;border-top:1px dashed var(--border);background:hsl(0 0% 98% / .6);border-bottom-left-radius:20px;border-bottom-right-radius:20px}
+    .output code{display:block;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:auto}
 
-    /* VIEW MODE */
-    .view{display:grid; gap:20px; align-items:start; padding:24px}
-    .profile{
-      display:grid; grid-template-columns:120px 1fr; gap:18px; align-items:center;
-      padding:16px; border:1px solid var(--border); border-radius:16px; background:#fff;
-    }
-    .avatar{width:120px; height:120px; border-radius:16px; object-fit:cover; border:1px solid var(--border)}
-    .name{font-size:1.4rem; font-weight:800}
-    .info{display:grid; gap:6px}
-    .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; border:1px solid var(--border); background:hsl(0 0% 100%)}
-    .pill{display:inline-block; padding:6px 10px; border-radius:999px; background:hsl(222 100% 60% / .08); color:var(--accent); font-weight:600; margin-right:6px; margin-bottom:6px}
-    .stack{display:flex; flex-wrap:wrap; gap:8px}
+    .view{display:grid;gap:20px;align-items:start;padding:24px}
+    .profile{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center;padding:16px;border:1px solid var(--border);border-radius:16px;background:#fff}
+    .avatar{width:120px;height:120px;border-radius:16px;object-fit:cover;border:1px solid var(--border)}
+    .name{font-size:1.4rem;font-weight:800}
+    .info{display:grid;gap:6px}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--border);background:hsl(0 0% 100%)}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:hsl(222 100% 60% / .08);color:var(--accent);font-weight:600;margin-right:6px;margin-bottom:6px}
+    .stack{display:flex;flex-wrap:wrap;gap:8px}
 
-    .toolbar{display:flex; flex-wrap:wrap; gap:10px}
-    .divider{height:1px; background:var(--border); margin:6px 0}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px}
+    .divider{height:1px;background:var(--border);margin:6px 0}
+    .footnote{font-size:.9rem;color:var(--muted)}
 
-    .footnote{font-size:.9rem; color:var(--muted)}
+    @media (max-width:720px){.row,.row-3{grid-template-columns:1fr}.profile{grid-template-columns:1fr}.avatar{justify-self:center}}
 
-    @media (max-width:720px){
-      .row, .row-3{grid-template-columns:1fr}
-      .profile{grid-template-columns:1fr}
-      .avatar{justify-self:center}
-    }
+    /* test panel (only visible with ?test=1) */
+    #testPanel{display:none;margin-top:20px}
+    #testPanel pre{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;overflow:auto}
   </style>
 </head>
 <body>
@@ -121,10 +111,16 @@
           </div>
         </div>
         <div class="row-1">
-          <label>Profile Picture</label>
+          <div>
+            <label for="photoUrl">Profile Photo URL (optional — keeps link short)</label>
+            <input id="photoUrl" type="url" placeholder="https://example.com/myphoto.jpg" />
+          </div>
+        </div>
+        <div class="row-1">
+          <label>Profile Picture (upload to embed if no URL)</label>
           <div class="file-input">
             <button type="button" id="pick">Choose Image</button>
-            <span id="pickLabel" class="muted">JPG or PNG. We'll resize for a compact link.</span>
+            <span id="pickLabel" class="muted">JPG or PNG (embedding increases link size).</span>
             <input id="photo" type="file" accept="image/*" hidden />
           </div>
         </div>
@@ -141,6 +137,10 @@
           <button class="btn secondary" id="copyLink" type="button">Copy Link</button>
           <a id="openLink" class="btn primary" href="#" target="_blank" rel="noopener">Open View</a>
         </div>
+      </div>
+      <div id="testPanel" class="output">
+        <strong>Inline Tests</strong>
+        <pre id="testReport"></pre>
       </div>
     </section>
 
@@ -173,10 +173,9 @@
   </div>
 
   <script>
-    // --- Utilities ---
+    // ---------- Utilities ----------
     const $ = (sel) => document.querySelector(sel);
 
-    // Base64 for Unicode strings
     function b64EncodeUnicode(str){
       return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m,p)=>String.fromCharCode('0x'+p)));
     }
@@ -196,18 +195,14 @@
       const scale = Math.min(max/width, max/height, 1);
       canvas.width = Math.round(width*scale);
       canvas.height = Math.round(height*scale);
-      ctx.fillStyle = '#fff'; // for JPEG background
+      ctx.fillStyle = '#fff';
       ctx.fillRect(0,0,canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(blobURL);
       return canvas.toDataURL('image/jpeg', quality);
     }
 
-    // Parse query and hash payload
-    function getQuery(){
-      return new URLSearchParams(location.search);
-    }
-
+    function getQuery(){ return new URLSearchParams(location.search); }
     function buildViewURL(payloadB64){
       const url = new URL(location.href);
       url.search = '?view=1';
@@ -222,8 +217,11 @@
       let linkedin = $('#linkedin').value.trim();
       if (linkedin && !/^https?:\/\//i.test(linkedin)) linkedin = 'https://' + linkedin;
       const interestsRaw = $('#interests').value.trim();
-      const interests = interestsRaw ? Array.from(new Set(interestsRaw.split(/[,\n]/).map(s=>s.trim()).filter(Boolean))) : [];
-      return { name, phone, email, linkedin, interests };
+      // IMPORTANT: split by comma OR newline — fixed regex
+      const interests = interestsRaw ? Array.from(new Set(interestsRaw.split(/[\,\n]/).map(s=>s.trim()).filter(Boolean))) : [];
+      let photoUrl = ($('#photoUrl') ? $('#photoUrl').value.trim() : '');
+      if (photoUrl && !/^https?:\/\//i.test(photoUrl)) photoUrl = 'https://' + photoUrl;
+      return { name, phone, email, linkedin, interests, photoUrl };
     }
 
     function validate(payload){
@@ -231,6 +229,7 @@
       if(!payload.name) errors.push('Full Name is required');
       if(payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) errors.push('Email looks invalid');
       if(payload.linkedin && !/^https?:\/\//i.test(payload.linkedin)) errors.push('LinkedIn URL must start with http(s)');
+      if(payload.photoUrl && !/^https?:\/\//i.test(payload.photoUrl)) errors.push('Photo URL must start with http(s)');
       return errors;
     }
 
@@ -266,7 +265,8 @@
       });
 
       const img = $('#vPhoto');
-      if(payload.photo){ img.src = payload.photo; img.style.display='block'; }
+      const src = payload.photoUrl || payload.photo;
+      if(src){ img.src = src; img.style.display='block'; }
       else { img.src=''; img.style.display='none'; }
 
       // vCard download link
@@ -277,41 +277,24 @@
         payload.phone ? `TEL;TYPE=CELL:${payload.phone}` : '',
         payload.email ? `EMAIL;TYPE=INTERNET:${payload.email}` : '',
         payload.linkedin ? `URL:${payload.linkedin}` : '',
+        payload.photoUrl ? `PHOTO;VALUE=URI:${payload.photoUrl}` : '',
         'END:VCARD'
       ].filter(Boolean).join('\n');
       $('#downloadVcf').href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcf);
 
-      // copy link button
+      // copy link button (for view mode)
       $('#copyCardLink').onclick = async () => {
         try{ await navigator.clipboard.writeText(location.href); alert('Card link copied!'); }
         catch{ prompt('Copy this link:', location.href); }
       };
     }
 
-    async function init(){
-      const isView = getQuery().get('view') === '1';
-      if(isView){
-        toggle('view');
-        const hash = location.hash.startsWith('#') ? location.hash.slice(1) : '';
-        try{
-          const json = b64DecodeUnicode(hash || '');
-          const payload = JSON.parse(json || '{}');
-          renderView(payload);
-        }catch(e){
-          // Fallback: no payload
-          renderView({});
-        }
-        return;
-      }
-
-      // EDIT MODE
-      toggle('edit');
-
+    function wireEditMode(){
       // File picker proxy
       $('#pick').onclick = () => $('#photo').click();
       $('#photo').addEventListener('change', () => {
         const f = $('#photo').files[0];
-        $('#pickLabel').textContent = f ? `${f.name} • ${(f.size/1024|0)} KB` : 'JPG or PNG. We\'ll resize for a compact link.';
+        $('#pickLabel').textContent = f ? `${f.name} • ${(f.size/1024|0)} KB` : 'JPG or PNG (embedding increases link size).';
       });
 
       // Preview button
@@ -320,8 +303,13 @@
         const errors = validate(base);
         if(errors.length){ alert(errors.join('\n')); return; }
         const f = $('#photo').files[0];
-        const photo = await resizeImageToDataURL(f);
-        const payload = {...base, photo};
+        let payload = { ...base };
+        if (base.photoUrl) {
+          payload.photoUrl = base.photoUrl; // prefer hosted URL to keep link short
+        } else if (f) {
+          const photo = await resizeImageToDataURL(f);
+          payload.photo = photo; // fallback to embedded image
+        }
         renderView(payload);
         toggle('view');
         history.replaceState(null, '', buildViewURL(b64EncodeUnicode(JSON.stringify(payload))));
@@ -333,8 +321,13 @@
         const errors = validate(base);
         if(errors.length){ alert(errors.join('\n')); return; }
         const f = $('#photo').files[0];
-        const photo = await resizeImageToDataURL(f);
-        const payload = {...base, photo};
+        let payload = { ...base };
+        if (base.photoUrl) {
+          payload.photoUrl = base.photoUrl; // keep link short
+        } else if (f) {
+          const photo = await resizeImageToDataURL(f);
+          payload.photo = photo; // fallback to embedded image
+        }
         const b64 = b64EncodeUnicode(JSON.stringify(payload));
         const link = buildViewURL(b64);
         $('#generatedUrl').textContent = link;
@@ -343,7 +336,7 @@
         try{ await navigator.clipboard.writeText(link); }catch{}
       };
 
-      // Copy link
+      // Copy link in edit panel
       $('#copyLink').onclick = async ()=>{
         const link = $('#generatedUrl').textContent;
         if(!link) return;
@@ -353,15 +346,74 @@
 
       // Reset
       $('#clearBtn').onclick = ()=>{ 
-        ['fullName','phone','email','linkedin','interests'].forEach(id=>$('#'+id).value='');
+        ['fullName','phone','email','linkedin','interests','photoUrl'].forEach(id=>$('#'+id).value='');
         $('#photo').value='';
-        $('#pickLabel').textContent='JPG or PNG. We\'ll resize for a compact link.';
+        $('#pickLabel').textContent='JPG or PNG (embedding increases link size).';
         $('#linkOutput').hidden = true;
       };
+    }
+
+    // ---------- Inline tests ----------
+    function runTests(){
+      const out = [];
+      function ok(name, pass, extra=''){
+        out.push(`${pass ? '✅' : '❌'} ${name}${extra ? ' — ' + extra : ''}`);
+        console[pass ? 'log' : 'error'](name, pass ? '' : extra);
+      }
+
+      // Test 1: interests split & trim & unique
+      try{
+        const raw = 'A, B\nC\nA ,  D';
+        const arr = Array.from(new Set(raw.split(/[\,\n]/).map(s=>s.trim()).filter(Boolean)));
+        ok('Interests split unique', JSON.stringify(arr) === JSON.stringify(['A','B','C','D']), JSON.stringify(arr));
+      }catch(e){ ok('Interests split unique', false, e.message); }
+
+      // Test 2: buildViewURL keeps ?view=1 and sets hash
+      try{
+        const link = buildViewURL('abc');
+        const u = new URL(link);
+        ok('buildViewURL query', u.search === '?view=1', u.search);
+        ok('buildViewURL hash', u.hash === '#abc', u.hash);
+      }catch(e){ ok('buildViewURL', false, e.message); }
+
+      // Test 3: vCard escapes commas
+      try{
+        const payload = {name:'Doe, Jane', phone:'123', email:'a@b.com', linkedin:'https://x.y', photoUrl:'https://x/y.jpg'};
+        const vcf = [
+          'BEGIN:VCARD','VERSION:3.0',`FN:${(payload.name||'').replace(/,/g,'\\,')}`,'END:VCARD'
+        ].join('\n');
+        ok('vCard escape', vcf.includes('FN:Doe\\, Jane'), vcf);
+      }catch(e){ ok('vCard escape', false, e.message); }
+
+      const report = out.join('\n');
+      const qp = getQuery();
+      if(qp.get('test') === '1'){
+        const panel = $('#testPanel');
+        panel.style.display = 'block';
+        $('#testReport').textContent = report;
+      }
+    }
+
+    // ---------- Init ----------
+    function init(){
+      const isView = getQuery().get('view') === '1';
+      if(isView){
+        toggle('view');
+        try{
+          const hash = location.hash.startsWith('#') ? location.hash.slice(1) : '';
+          const json = hash ? b64DecodeUnicode(hash) : '{}';
+          const payload = JSON.parse(json);
+          renderView(payload);
+        }catch(e){ renderView({}); }
+      } else {
+        toggle('edit');
+        wireEditMode();
+        // show tests only if requested, but always run in console
+        runTests();
+      }
     }
 
     init();
   </script>
 </body>
 </html>
-
