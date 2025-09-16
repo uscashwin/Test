@@ -1,380 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NFC Contact Card – Create & Share</title>
-  <style>
-    :root{
-      --bg:#0b0f19;--card:#111729;--muted:#9aa4b2;--text:#e5ecf4;--acc:#6ee7f9;--acc-2:#a78bfa;--ok:#34d399;
-      --radius:18px;--shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;
-      color:var(--text);background:radial-gradient(1200px 800px at 10% -10%, #1d2a5a33, transparent),
-              radial-gradient(900px 600px at 100% 0%, #5b21b633, transparent),
-              var(--bg);
-    }
-    .wrap{max-width:980px;margin:0 auto;padding:24px}
-    header{display:flex;align-items:center;gap:12px;margin:10px 0 24px}
-    .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc-2));
-      display:grid;place-items:center;box-shadow:var(--shadow);font-weight:800;color:#0b0f19}
-    h1{font-size:clamp(20px,2.6vw,28px);margin:0}
-    .card{background:linear-gradient(180deg,#0f172a,#0b1328 45%,#0a0f22);border:1px solid #253052;border-radius:var(--radius);
-      box-shadow:var(--shadow);overflow:hidden}
-    .grid{display:grid;grid-template-columns:1.1fr .9fr}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .pane{padding:28px}
-    .muted{color:var(--muted)}
-    label{display:block;font-size:13px;color:var(--muted);margin:16px 0 8px}
-    input,textarea{width:100%;padding:14px 14px;border-radius:12px;border:1px solid #263149;background:#0e152b;color:var(--text);
-      outline:none;box-shadow:inset 0 0 0 1px #0b1022}
-    textarea{min-height:96px;resize:vertical}
-    .row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
-    @media (max-width:640px){.row{grid-template-columns:1fr}}
-    .btn{appearance:none;border:none;background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#061020;font-weight:700;
-      padding:14px 18px;border-radius:14px;cursor:pointer;box-shadow:0 8px 20px rgba(111,200,255,.25)}
-    .btn.secondary{background:#0f172a;color:var(--text);border:1px solid #2a365a;box-shadow:none}
-    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
-    .hint{font-size:12px;color:var(--muted)}
-    .avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:2px solid #2b365e;box-shadow:0 8px 20px rgba(0,0,0,.35)}
-    .drop{border:1.5px dashed #31406f;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;
-      background:#0b1227}
-    .drop input{display:none}
-    .tag{display:inline-block;background:#0e1a36;border:1px solid #243059;color:#dbeafe;padding:.35rem .6rem;border-radius:999px;margin:.15rem .25rem .15rem 0;font-size:.8rem}
-    .share{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
-    .share input{flex:1;min-width:260px}
-
-    /* VIEW CARD */
-    .v-wrap{display:grid;gap:22px;grid-template-columns:160px 1fr;align-items:center}
-    @media (max-width:700px){.v-wrap{grid-template-columns:1fr;justify-items:center;text-align:center}}
-    .v-head{display:flex;align-items:center;gap:16px}
-    .v-title{font-size:clamp(22px,2.4vw,30px);font-weight:800;margin:0}
-    .v-sub{margin:2px 0 0;color:#b6c2d6}
-    .v-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
-    .chip{padding:.4rem .7rem;border-radius:999px;background:#0f1b36;border:1px solid #243059;color:#dbeafe;font-size:.85rem}
-    .contact a{color:var(--acc);text-decoration:none}
-    .qr{background:#0f172a;border:1px solid #2a365a;border-radius:12px;padding:10px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shareable Profile Card</title>
+<style>
+  :root{
+    --bg: #0b0f14;
+    --card: #0f1620;
+    --muted: #94a3b8;
+    --text: #e5eef9;
+    --accent: #4f46e5;
+    --accent2: #22d3ee;
+    --ok: #10b981;
+    --warn:#f59e0b;
+    --err:#ef4444;
+    --ring: rgba(79,70,229,.4);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(79,70,229,.35), transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, rgba(34,211,238,.25), transparent 60%),
+      linear-gradient(180deg, #0b0f14, #0b0f14);
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:24px}
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin:8px 0 20px 0;
+  }
+  .brand{font-weight:700;letter-spacing:.4px}
+  .brand .b1{font-size:22px}
+  .brand .b2{font-size:12px;color:var(--muted)}
+  .card{
+    background:rgba(15,22,32,.7);
+    border:1px solid rgba(148,163,184,.15);
+    border-radius:var(--radius);
+    box-shadow: 0 8px 30px rgba(2,8,23,.55), inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter: blur(6px);
+  }
+  .grid{display:grid; gap:20px}
+  @media(min-width:820px){ .grid{ grid-template-columns: 1.1fr 1fr; } }
+  .section{padding:20px}
+  .section h2{margin:0 0 12px 0; font-size:18px; letter-spacing:.3px}
+  .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  label{font-size:13px; color:var(--muted)}
+  input[type="text"],
+  input[type="url"],
+  input[type="email"],
+  input[type="tel"],
+  select,
+  textarea{
+    background:#0b111a; color:var(--text);
+    border:1px solid rgba(148,163,184,.25);
+    border-radius:12px; padding:12px 14px; outline:none;
+    transition:border .15s, box-shadow .15s, transform .02s;
+  }
+  input:focus, select:focus, textarea:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 6px var(--ring);
+  }
+  .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+  .hint{font-size:12px;color:var(--muted)}
+  .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+  .btn{
+    appearance:none; border:1px solid transparent; cursor:pointer;
+    background:linear-gradient(135deg, var(--accent), var(--accent2));
+    color:white; padding:12px 16px; border-radius:12px; font-weight:600;
+    box-shadow: 0 8px 22px rgba(79,70,229,.35);
+    transition: transform .06s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .btn.secondary{ background:#0b111a; border-color:rgba(148,163,184,.25); color:var(--text); box-shadow:none }
+  .btn.ghost{ background:transparent; border-color:rgba(148,163,184,.25); color:var(--text) }
+  .btn:active{ transform: translateY(1px) }
+  .divider{height:1px; background:linear-gradient(90deg, transparent, rgba(148,163,184,.25), transparent)}
+  .preview{
+    display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;
+  }
+  .avatar{
+    width:144px; height:144px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.08);
+    object-fit:cover; background:#0b111a;
+    box-shadow: 0 8px 26px rgba(2,8,23,.65), inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+  .name{font-size:20px; font-weight:700}
+  .meta{font-size:14px; color:var(--muted); line-height:1.35}
+  .list{width:100%; display:grid; gap:10px}
+  .item{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
+    background:#0b111a; border:1px solid rgba(148,163,184,.18);
+  }
+  .item a{ color:#c7d2fe; text-decoration:none; word-break: break-all }
+  .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono",monospace; font-size:13px; color:#cbd5e1}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#cbd5e1;
+    background:#0b111a; border:1px dashed rgba(148,163,184,.35); padding:8px 10px; border-radius:999px;
+  }
+  footer{color:var(--muted); font-size:12px; text-align:center; margin:20px 0 10px}
+  .hidden{display:none !important}
+  .error{color:var(--err); font-size:12px; margin-top:-6px}
+  .success{color:var(--ok); font-size:12px}
+  .upload{
+    border:1.5px dashed rgba(148,163,184,.35); border-radius:12px; padding:14px;
+    background:#0b111a; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  }
+  .upload input{display:none}
+  .upload .info{display:flex; flex-direction:column; gap:6px}
+  .chip{font-size:12px; color:var(--muted)}
+</style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="logo">ID</div>
-      <div>
-        <h1>NFC Contact Card</h1>
-        <div class="muted">Create a modern, read‑only contact card and copy a share link for your NFC tag.</div>
+      <div class="brand">
+        <div class="b1">Profile Card Generator</div>
+        <div class="b2">Create a read-only contact card link for networking</div>
       </div>
+      <span id="modeBadge" class="badge"><span>Mode:</span><strong id="modeText">Edit</strong></span>
     </header>
 
-    <div id="mode-create" class="card">
+    <div id="editView" class="card section">
+      <h2>Your Details</h2>
       <div class="grid">
-        <div class="pane">
-          <h2 style="margin:0 0 8px">Your details</h2>
-          <div class="muted">Fill the form. On “Generate Card”, a read‑only link is produced. Anyone opening that link can view your card but not edit it.</div>
-
-          <label>Profile picture</label>
-          <label class="drop" id="dropzone">
-            <img id="preview" class="avatar" src="" alt="Preview" style="display:none" />
-            <div>
-              <strong>Upload an image</strong>
-              <div class="hint">JPG/PNG • We’ll auto‑resize for fast sharing</div>
-            </div>
-            <input type="file" id="photo" accept="image/*" />
-          </label>
-
-          <label>Full name</label>
-          <input id="fullName" placeholder="Ada Lovelace" required />
+        <div>
+          <div class="field">
+            <label for="fullName">Full Name *</label>
+            <input id="fullName" type="text" placeholder="e.g., Ashwin Rajkumar" required />
+            <div class="error" id="errName"></div>
+          </div>
 
           <div class="row">
-            <div>
-              <label>University</label>
-              <input id="university" placeholder="USC" />
+            <div class="field">
+              <label for="university">University *</label>
+              <input id="university" type="text" placeholder="e.g., University of Southern California" required />
+              <div class="error" id="errUniversity"></div>
             </div>
-            <div>
-              <label>Major</label>
-              <input id="major" placeholder="Astronautical Engineering" />
+            <div class="field">
+              <label for="grade">Grade Level *</label>
+              <select id="grade" required>
+                <option value="">Select…</option>
+                <option>Freshman</option>
+                <option>Sophomore</option>
+                <option>Junior</option>
+                <option>Senior</option>
+                <option>Master’s</option>
+                <option>PhD</option>
+                <option>Alumni</option>
+                <option>Other</option>
+              </select>
+              <div class="error" id="errGrade"></div>
             </div>
           </div>
 
           <div class="row">
-            <div>
-              <label>Grade level</label>
-              <input id="grade" placeholder="Graduate (M.S.)" />
+            <div class="field">
+              <label for="major">Major *</label>
+              <input id="major" type="text" placeholder="e.g., Astronautical Engineering" required />
+              <div class="error" id="errMajor"></div>
             </div>
-            <div>
-              <label>LinkedIn URL</label>
-              <input id="linkedin" placeholder="https://www.linkedin.com/in/username" />
+            <div class="field">
+              <label for="interests">Interests (comma-separated)</label>
+              <input id="interests" type="text" placeholder="e.g., Propulsion, LLM Agents, Lunar Habitats" />
             </div>
           </div>
 
-          <label>Interests <span class="hint">(comma separated)</span></label>
-          <input id="interests" placeholder="Propulsion, In‑situ resource utilization, Robotics" />
-
           <div class="row">
-            <div>
-              <label>Phone</label>
-              <input id="phone" placeholder="+1 555‑123‑4567" />
+            <div class="field">
+              <label for="email">Email *</label>
+              <input id="email" type="email" placeholder="you@example.com" required />
+              <div class="error" id="errEmail"></div>
             </div>
-            <div>
-              <label>Email</label>
-              <input id="email" placeholder="name@example.com" />
+            <div class="field">
+              <label for="phone">Phone *</label>
+              <input id="phone" type="tel" placeholder="+1 555 123 4567" required />
+              <div class="error" id="errPhone"></div>
             </div>
+          </div>
+
+          <div class="field">
+            <label for="linkedin">LinkedIn URL *</label>
+            <input id="linkedin" type="url" placeholder="https://www.linkedin.com/in/your-handle" required />
+            <div class="error" id="errLinkedIn"></div>
+          </div>
+
+          <div class="field">
+            <label>Profile Photo (JPG/PNG, will be resized)</label>
+            <div class="upload">
+              <div class="info">
+                <div class="chip">Tip: Use a square image for best results.</div>
+                <div class="hint">Max link friendliness: we auto-resize to ~256×256 JPEG.</div>
+              </div>
+              <div>
+                <label class="btn ghost" for="photoInput">Choose Image</label>
+                <input id="photoInput" type="file" accept="image/*" />
+              </div>
+            </div>
+            <div class="hint" id="photoName"></div>
           </div>
 
           <div class="actions">
-            <button class="btn" id="generate">Generate Card</button>
-            <button class="btn secondary" id="clear">Reset</button>
+            <button id="generateBtn" class="btn">Generate Share Link</button>
+            <button id="clearBtn" class="btn secondary" type="button">Clear</button>
+          </div>
+          <div class="hint" style="margin-top:8px">
+            After generating, copy the link and embed it in a QR code. Opening the link shows a read-only card.
           </div>
         </div>
 
-        <div class="pane" style="border-left:1px solid #223055">
-          <h3 style="margin:0 0 8px">Share link</h3>
-          <div class="muted">After generating, copy the link below to program your NFC tag. It opens a read‑only view.</div>
-          <div class="share">
-            <input id="shareUrl" readonly placeholder="Your share link will appear here…" />
-            <button class="btn secondary" id="copy">Copy</button>
+        <div>
+          <div class="divider"></div>
+          <div class="section preview">
+            <img id="previewAvatar" class="avatar" alt="Profile Preview" />
+            <div class="name" id="previewName">Your Name</div>
+            <div class="meta" id="previewMeta">University • Major • Grade</div>
+            <div class="list">
+              <div class="item"><span>💼</span><a id="previewLinkedIn" href="#" target="_blank" rel="noopener">LinkedIn</a></div>
+              <div class="item"><span>✉️</span><a id="previewEmail" href="#">you@example.com</a></div>
+              <div class="item"><span>📞</span><span id="previewPhone" class="mono">+1 555 123 4567</span></div>
+              <div class="item"><span>⭐</span><span id="previewInterests">Your interests appear here</span></div>
+            </div>
           </div>
-          <p class="hint">Tip: Most NFC tags store a URL. Program this exact link into the tag.</p>
-          <div id="est" class="hint"></div>
         </div>
       </div>
     </div>
 
-    <div id="mode-view" class="card" style="display:none">
-      <div class="pane">
-        <div class="v-wrap">
-          <img id="v-photo" class="avatar" alt="Profile" />
-          <div>
-            <div class="v-head">
-              <div>
-                <h2 class="v-title" id="v-name"></h2>
-                <p class="v-sub" id="v-edu"></p>
-              </div>
-            </div>
-            <div class="v-row contact" style="margin-top:12px">
-              <span class="chip" id="v-email"></span>
-              <span class="chip" id="v-phone"></span>
-              <a class="chip" id="v-linkedin" target="_blank" rel="noopener">LinkedIn ↗</a>
-            </div>
-            <div style="margin-top:14px">
-              <div class="muted" style="margin-bottom:6px">Interests</div>
-              <div id="v-tags"></div>
-            </div>
+    <!-- View-only card -->
+    <div id="readView" class="card section hidden" aria-live="polite">
+      <div class="grid" style="grid-template-columns: 1fr;">
+        <div class="preview">
+          <img id="cardAvatar" class="avatar" alt="Profile Photo" />
+          <div class="name" id="cardName"></div>
+          <div class="meta" id="cardMeta"></div>
+          <div class="list" style="max-width:680px">
+            <div class="item"><span>💼</span><a id="cardLinkedIn" href="#" target="_blank" rel="noopener">LinkedIn</a></div>
+            <div class="item"><span>✉️</span><a id="cardEmail" href="#">Email</a></div>
+            <div class="item"><span>📞</span><span id="cardPhone" class="mono"></span></div>
+            <div class="item"><span>⭐</span><span id="cardInterests"></span></div>
           </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:12px;flex-wrap:wrap">
-          <div class="muted hint">This is a <strong>read‑only</strong> card. To make a new one, remove the URL hash.</div>
-          <canvas id="qr" class="qr" width="128" height="128" title="QR to this card"></canvas>
+          <div class="actions">
+            <button id="copyLinkBtn" class="btn secondary" type="button">Copy Link</button>
+            <button id="downloadVcfBtn" class="btn" type="button">Download vCard (.vcf)</button>
+          </div>
+          <div id="copyStatus" class="hint"></div>
         </div>
       </div>
     </div>
+
+    <footer>© <span id="year"></span> Shareable Profile Card • Modern UI</footer>
   </div>
 
-  <!-- LZ‑String (URI safe) https://github.com/pieroxy/lz-string | Minified subset (compressToEncodedURIComponent / decompressFromEncodedURIComponent) -->
-  <script>
-  const LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n={};var t={};var e={compressToEncodedURIComponent:function(r){if(null==r)return"";return e._compress(r,6,function(o){return"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$".charAt(o)})},decompressFromEncodedURIComponent:function(r){if(null==r)return"";if(r=="")return null;r=r.replace(/ /g,"+");return e._decompress(r.length,32,function(n){return o("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",r.charAt(n))})},_compress:function(o,t,e){if(null==o)return"";var i,s,u,a={},c={},l="",f="",h="",p=2,d=3,v=2,g=[],m=0,y=0;for(u=0;u<o.length;u+=1)if(l=o.charAt(u),Object.prototype.hasOwnProperty.call(a,l)||(a[l]=d++,c[l]=!0),f=h+l,Object.prototype.hasOwnProperty.call(a,f))h=f;else{if(Object.prototype.hasOwnProperty.call(c,h)){if(h.charCodeAt(0)<256){for(i=0;i<v;i++)m<<=1,y==t-1?(y=0,g.push(e(m)),m=0):y++;for(s=h.charCodeAt(0),i=0;i<8;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}else{for(s=1,i=0;i<v;i++)m=m<<1|s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s=0;for(s=h.charCodeAt(0),i=0;i<16;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}p--,0==p&&(p=Math.pow(2,v),v++),delete c[h]}else for(s=a[h],i=0;i<v;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1;p--,0==p&&(p=Math.pow(2,v),v++),a[f]=d++,h=String(l)}if(""!==h){if(Object.prototype.hasOwnProperty.call(c,h)){if(h.charCodeAt(0)<256){for(i=0;i<v;i++)m<<=1,y==t-1?(y=0,g.push(e(m)),m=0):y++;for(s=h.charCodeAt(0),i=0;i<8;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}else{for(s=1,i=0;i<v;i++)m=m<<1|s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s=0;for(s=h.charCodeAt(0),i=0;i<16;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}p--,0==p&&(p=Math.pow(2,v),v++),delete c[h]}else for(s=a[h],i=0;i<v;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1;p--,0==p&&(p=Math.pow(2,v),v++)}for(s=2,i=0;i<v;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1;for(;;){if(m<<=1,y==t-1){g.push(e(m));break}y++}return g.join("")},_decompress:function(o,t,e){var i,s,u,a,c,l,f,h,p=[],d=4,v=4,g=3,m="",y=[],w={val:e(0),position:t,index:1};for(i=0;i<3;i+=1)p[i]=i;for(u=0,c=Math.pow(2,2),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;switch(s=parseInt(m,2),s){case 0:for(m="",c=Math.pow(2,8),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;f=p[3]=r(parseInt(m,2));break;case 1:for(m="",c=Math.pow(2,16),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;f=p[3]=r(parseInt(m,2));break;case 2:return""}for(y.push(f),h=f;w.index<=o;){for(m="",c=Math.pow(2,g),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;switch(f=s=parseInt(m,2),s){case 0:for(m="",c=Math.pow(2,8),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;p[v++]=r(parseInt(m,2)),f=v-1,g--;break;case 1:for(m="",c=Math.pow(2,16),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;p[v++]=r(parseInt(m,2)),f=v-1,g--;break;case 2:return y.join("")}0==g&&(g=Math.pow(2,++d));if(p[f])h=p[f];else{if(f!==v)return null;h=h+ h.charAt(0)}y.push(h),p[v++]=h=h+ h.charAt(0)}return y.join("")}};return e}();
-  </script>
+<script>
+(function(){
+  const $ = sel => document.querySelector(sel);
 
-  <script>
-    const $ = (id)=>document.getElementById(id);
+  // Elements (Edit mode)
+  const editView = $('#editView');
+  const readView = $('#readView');
+  const modeText = $('#modeText');
+  const photoInput = $('#photoInput');
+  const photoName = $('#photoName');
+  const fullName = $('#fullName');
+  const university = $('#university');
+  const major = $('#major');
+  const grade = $('#grade');
+  const interests = $('#interests');
+  const email = $('#email');
+  const phone = $('#phone');
+  const linkedin = $('#linkedin');
+  const generateBtn = $('#generateBtn');
+  const clearBtn = $('#clearBtn');
 
-    // --- Image handling: resize to ~256x256 JPEG for compact share size ---
-    async function fileToDataURL(file, max=256){
-      return new Promise((resolve,reject)=>{
+  // Preview (Edit)
+  const previewAvatar = $('#previewAvatar');
+  const previewName = $('#previewName');
+  const previewMeta = $('#previewMeta');
+  const previewLinkedIn = $('#previewLinkedIn');
+  const previewEmail = $('#previewEmail');
+  const previewPhone = $('#previewPhone');
+  const previewInterests = $('#previewInterests');
+
+  // Read-only card
+  const cardAvatar = $('#cardAvatar');
+  const cardName = $('#cardName');
+  const cardMeta = $('#cardMeta');
+  const cardLinkedIn = $('#cardLinkedIn');
+  const cardEmail = $('#cardEmail');
+  const cardPhone = $('#cardPhone');
+  const cardInterests = $('#cardInterests');
+  const copyLinkBtn = $('#copyLinkBtn');
+  const copyStatus = $('#copyStatus');
+  const downloadVcfBtn = $('#downloadVcfBtn');
+
+  // Error fields
+  const err = {
+    name: $('#errName'),
+    university: $('#errUniversity'),
+    grade: $('#errGrade'),
+    major: $('#errMajor'),
+    email: $('#errEmail'),
+    phone: $('#errPhone'),
+    linkedin: $('#errLinkedIn'),
+  };
+
+  // Defaults for preview
+  let imageDataURL = '';
+
+  previewAvatar.src = '';
+  $('#year').textContent = new Date().getFullYear();
+
+  // Utility: sanitize text (basic)
+  const sanitize = s => (s || '').toString().trim();
+
+  // Utility: base64url encode/decode
+  function b64urlEncode(str){
+    return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function b64urlDecode(str){
+    str = str.replace(/-/g,'+').replace(/_/g,'/');
+    while (str.length % 4) str += '=';
+    return atob(str);
+  }
+
+  // Utility: resize image to square canvas, return JPEG data URL
+  function resizeImageToDataURL(file, maxSize=256, quality=0.75){
+    return new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = e=>{
         const img = new Image();
-        const reader = new FileReader();
-        reader.onload = e=>{img.src = e.target.result};
-        reader.onerror = reject;
         img.onload = ()=>{
-          const scale = Math.min(max/img.width, max/img.height, 1);
-          const w = Math.max(1, Math.round(img.width*scale));
-          const h = Math.max(1, Math.round(img.height*scale));
-          const c = document.createElement('canvas');
-          c.width = w; c.height = h;
-          const ctx = c.getContext('2d');
-          ctx.drawImage(img,0,0,w,h);
-          // quality 0.75 keeps size modest
-          const data = c.toDataURL('image/jpeg', 0.75);
-          resolve(data);
+          const side = Math.min(maxSize, Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          // Keep aspect ratio, fit within square, letterbox with transparent bg
+          const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+          canvas.width = maxSize;
+          canvas.height = maxSize;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#0b111a';
+          ctx.fillRect(0,0,maxSize,maxSize);
+          const dx = Math.round((maxSize - w)/2);
+          const dy = Math.round((maxSize - h)/2);
+          ctx.drawImage(img, dx, dy, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
         };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // QR (minimal): generate basic QR using third‑party CDN fallback? We’ll draw a simple placeholder grid using a tiny library‑less approach.
-    // For reliability without network, we keep a tiny, dependency‑free QR encoder (Kazuhiko Arase, MIT) stripped.
-    // --- BEGIN tiny QR encoder (version=5, EC=L) ---
-    // Source adapted and minimized from https://github.com/kazuhikoarase/qrcode-generator (MIT)
-    // Only keeps createSvgTag / addData / make / modules.
-    (function(){
-      function QR8bitByte(data){this.mode=4;this.data=data;this.parsed=[];for(let i=0;i<data.length;i++){this.parsed.push(data.charCodeAt(i));}}
-      QR8bitByte.prototype={getLength:function(){return this.parsed.length},write:function(buf){for(var i=0;i<this.parsed.length;i++){buf.put(this.parsed[i],8)}}};
-      function QRBitBuffer(){this.buffer=[],this.length=0}
-      QRBitBuffer.prototype={get:function(i){return (this.buffer[Math.floor(i/8)]>>> (7 - i%8)) &1},
-        put:function(num,length){for(let i=0;i<length;i++){this.putBit(((num>>> (length - i -1))&1)==1)}},
-        putBit:function(bit){this.buffer[Math.floor(this.length/8)] ||=0; if(bit){this.buffer[Math.floor(this.length/8)] |= (0x80>>> (this.length%8))} this.length++;}
+        img.onerror = reject;
+        img.src = e.target.result;
       };
-      function QRMath(){}
-      QRMath.glog=function(n){if(n<1)throw new Error('glog');return LOG_TABLE[n]};
-      QRMath.gexp=function(n){for(;n<0;)n+=255;for(;n>=256;)n-=255;return EXP_TABLE[n]};
-      const EXP_TABLE=new Array(256), LOG_TABLE=new Array(256); for(let i=0;i<8;i++)EXP_TABLE[i]=1<<i; for(let i=8;i<256;i++)EXP_TABLE[i]=EXP_TABLE[i-4]^EXP_TABLE[i-5]^EXP_TABLE[i-6]^EXP_TABLE[i-8]; for(let i=0;i<256;i++)LOG_TABLE[EXP_TABLE[i]]=i;
-      function QRPolynomial(num, shift){let offset=0; while(offset<num.length&&num[offset]==0)offset++; this.num=new Array(num.length-offset+shift); for(let i=0;i<num.length-offset;i++)this.num[i]=num[i+offset]}
-      QRPolynomial.prototype={get:function(i){return this.num[i]},getLength:function(){return this.num.length},
-        multiply:function(e){var num=new Array(this.getLength()+e.getLength()-1); for(let i=0;i<this.getLength();i++)for(let j=0;j<e.getLength();j++)num[i+j]^=QRMath.gexp(QRMath.glog(this.get(i))+QRMath.glog(e.get(j))); return new QRPolynomial(num,0)},
-        mod:function(e){if(this.getLength()-e.getLength()<0)return this; var ratio=QRMath.glog(this.get(0))-QRMath.glog(e.get(0)); var num=this.num.slice(); for(let i=0;i<e.getLength();i++)num[i]^=QRMath.gexp(QRMath.glog(e.get(i))+ratio); return new QRPolynomial(num,0).mod(e)}
-      };
-      function QRRSBlock(){ }
-      QRRSBlock.getRSBlocks=function(type){return RS_BLOCK_TABLE[type]};
-      const RS_BLOCK_TABLE={1:[[1,19,7]],2:[[1,34,10]],3:[[1,55,15]],4:[[1,80,20]],5:[[1,108,26]],6:[[1,136,18]],7:[[2,156,20]],8:[[2,194,24]],9:[[2,232,30]],10:[[2,274,18]]};
-      function QRCode(type){this.type=type; this.modules=null; this.moduleCount=0; this.dataList=[]}
-      QRCode.prototype={addData:function(data){this.dataList.push(new QR8bitByte(data))},make:function(){this.makeImpl(1)},
-        makeImpl:function(eclevel){this.moduleCount=typeToSize(this.type); this.modules=new Array(this.moduleCount); for(let r=0;r<this.moduleCount;r++){this.modules[r]=new Array(this.moduleCount); for(let c=0;c<this.moduleCount;c++)this.modules[r][c]=null}
-          setupPos(this,0,0); setupPos(this,this.moduleCount-7,0); setupPos(this,0,this.moduleCount-7);
-          let data=createData(this.type,this.dataList); mapData(this,data); }
-      };
-      function typeToSize(t){return 21+(t-1)*4}
-      function setupPos(qr,row,col){for(let r=-1;r<=7;r++)for(let c=-1;c<=7;c++){let rr=row+r,cc=col+c; if(rr<0||rr>=qr.moduleCount||cc<0||cc>=qr.moduleCount)continue; let v=(r>=0&&r<=6&&(c==0||c==6))||(c>=0&&c<=6&&(r==0||r==6))||(r>=2&&r<=4&&c>=2&&c<=4); qr.modules[rr][cc]=v}}
-      function createData(type, dataList){let rs=QRRSBlock.getRSBlocks(type)[0]; let buffer=new QRBitBuffer(); for(let i=0;i<dataList.length;i++){let d=dataList[i]; buffer.put(4,4); buffer.put(d.getLength(),8); d.write(buffer);} let totalDataCount=rs[2];
-        // pad
-        for(let i=0;i<totalDataCount;i++) buffer.put(0,8);
-        return new Array(totalDataCount).fill(0).map((_,i)=> buffer.buffer[i]||0);
-      }
-      function mapData(qr, data){let inc=-1,row=qr.moduleCount-1,bitIndex=0,byteIndex=0; for(let col=qr.moduleCount-1; col>0; col-=2){if(col==6)col--; for(;;){ for(let c=0;c<2;c++){let cc=col-c; if(qr.modules[row][cc]==null){ let dark = ((byteIndex<data.length) && (((data[byteIndex]>>> (7-bitIndex)) &1)==1)); qr.modules[row][cc]=dark; bitIndex++; if(bitIndex==8){bitIndex=0; byteIndex++;}}}
-          row+=inc; if(row<0||row>=qr.moduleCount){row-=inc; inc=-inc; break}}
-      }
-      window.__miniQR = function(text){let t=1; // pick small type up to 10
-        for(;t<10 && text.length> (RS_BLOCK_TABLE[t][0][1]-RS_BLOCK_TABLE[t][0][2]); t++); let qr=new QRCode(t); qr.addData(text); qr.make(); return qr.modules; };
-    })();
-    // --- END tiny QR encoder ---
-
-    function drawQR(canvas, text){
-      const modules = window.__miniQR(text);
-      const n = modules.length;
-      const scale = Math.floor(Math.min(canvas.width, canvas.height) / (n+2));
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#0b0f19'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#e5ecf4';
-      for(let r=0;r<n;r++){
-        for(let c=0;c<n;c++){
-          if(modules[r][c]) ctx.fillRect((c+1)*scale,(r+1)*scale, scale, scale);
-        }
-      }
-    }
-
-    function validateUrl(u){try{const url=new URL(u); return /^https?:/.test(url.protocol);}catch{ return false;}}
-    function sanitize(s){return (s||'').trim()}
-
-    async function buildPayload(){
-      const name = sanitize($("fullName").value);
-      if(!name) { alert('Please enter your full name.'); return }
-      const email = sanitize($("email").value);
-      if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email.'); return }
-      const phone = sanitize($("phone").value);
-      const linkedin = sanitize($("linkedin").value);
-      if(linkedin && !validateUrl(linkedin)) { alert('Please enter a valid LinkedIn URL.'); return }
-
-      // Image (optional)
-      let photoData = '';
-      const file = $("photo").files[0];
-      if(file){
-        photoData = await fileToDataURL(file, 256); // resized data URL
-      }
-
-      const payload = {
-        v:1,
-        n:name,
-        u:sanitize($("university").value),
-        m:sanitize($("major").value),
-        g:sanitize($("grade").value),
-        i:sanitize($("interests").value),
-        l:linkedin,
-        p:phone,
-        e:email,
-        img:photoData // may be empty string
-      };
-      return payload;
-    }
-
-    function estimateSize(str){
-      // crude byte length estimate for NFC planning
-      return new TextEncoder().encode(str).length;
-    }
-
-    function toShareURL(payload){
-      const json = JSON.stringify(payload);
-      const compressed = LZString.compressToEncodedURIComponent(json);
-      return location.origin + location.pathname + '#v=' + compressed;
-    }
-
-    function renderView(data){
-      $("mode-create").style.display='none';
-      $("mode-view").style.display='block';
-      $("v-name").textContent = data.n || '';
-      const eduBits = [data.u, data.m, data.g].filter(Boolean);
-      $("v-edu").textContent = eduBits.join(' • ');
-      if(data.img){ $("v-photo").src = data.img; } else { $("v-photo").src='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#0e162f"/><text x="50%" y="55%" text-anchor="middle" fill="#6b7280" font-family="sans-serif" font-size="42">👤</text></svg>'); }
-      const tagWrap = $("v-tags"); tagWrap.innerHTML='';
-      (data.i||'').split(',').map(s=>s.trim()).filter(Boolean).slice(0,12).forEach(t=>{
-        const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagWrap.appendChild(span);
-      });
-      $("v-email").textContent = data.e? data.e : '—';
-      $("v-phone").textContent = data.p? data.p : '—';
-      const link = $("v-linkedin");
-      if(data.l){ link.href=data.l; link.style.display='inline-block'} else { link.style.display='none' }
-      // QR of the exact URL on screen
-      drawQR($("qr"), location.href);
-    }
-
-    function maybeViewFromHash(){
-      const h = location.hash;
-      if(h.startsWith('#v=')){
-        try{
-          const comp = h.slice(3);
-          const json = LZString.decompressFromEncodedURIComponent(comp);
-          const obj = JSON.parse(json);
-          renderView(obj);
-          return true;
-        }catch(err){ console.error(err); alert('This link is corrupted or unsupported.'); }
-      }
-      return false;
-    }
-
-    // --- Event wiring ---
-    document.addEventListener('DOMContentLoaded', ()=>{
-      if(maybeViewFromHash()) return;
-
-      const drop = $('dropzone');
-      const file = $('photo');
-      const preview = $('preview');
-      function showPreview(f){ if(!f) return; const url=URL.createObjectURL(f); preview.src=url; preview.style.display='block'; }
-      drop.addEventListener('click', ()=> file.click());
-      drop.addEventListener('dragover', e=>{e.preventDefault(); drop.style.borderColor='#3b82f6'});
-      drop.addEventListener('dragleave', ()=> drop.style.borderColor='#31406f');
-      drop.addEventListener('drop', e=>{e.preventDefault(); drop.style.borderColor='#31406f'; if(e.dataTransfer.files[0]){ file.files = e.dataTransfer.files; showPreview(e.dataTransfer.files[0]) }});
-      file.addEventListener('change', ()=> showPreview(file.files[0]));
-
-      $('generate').addEventListener('click', async ()=>{
-        const payload = await buildPayload(); if(!payload) return;
-        const url = toShareURL(payload);
-        $('shareUrl').value = url;
-        const bytes = estimateSize(url);
-        $('est').textContent = `Approx. URL size: ${bytes} bytes`;
-        // also switch to view so they can verify
-        history.replaceState(null,'', url);
-        renderView(payload);
-      });
-
-      $('copy').addEventListener('click', async()=>{
-        const val=$('shareUrl').value; if(!val){return}
-        try{ await navigator.clipboard.writeText(val); $('copy').textContent='Copied!'; setTimeout(()=>{$('copy').textContent='Copy'},1200)} catch{ alert('Copy failed. Select and copy manually.') }
-      });
-      $('clear').addEventListener('click', ()=>{ document.querySelectorAll('input, textarea').forEach(el=> el.value=''); $('shareUrl').value=''; $('preview').style.display='none'; })
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
+  }
 
-    window.addEventListener('hashchange', ()=>{ location.reload() });
-  </script>
+  function updatePreview(){
+    previewName.textContent = sanitize(fullName.value) || 'Your Name';
+    const uni = sanitize(university.value) || 'University';
+    const maj = sanitize(major.value) || 'Major';
+    const grd = sanitize(grade.value) || 'Grade';
+    previewMeta.textContent = `${uni} • ${maj} • ${grd}`;
+
+    const li = sanitize(linkedin.value);
+    previewLinkedIn.href = li || '#';
+    previewLinkedIn.textContent = li || 'LinkedIn';
+
+    const em = sanitize(email.value) || 'you@example.com';
+    previewEmail.href = em ? `mailto:${em}` : '#';
+    previewEmail.textContent = em;
+
+    const ph = sanitize(phone.value) || '+1 555 123 4567';
+    previewPhone.textContent = ph;
+
+    const ints = sanitize(interests.value);
+    previewInterests.textContent = ints || 'Your interests appear here';
+    if (imageDataURL) previewAvatar.src = imageDataURL;
+  }
+
+  ['input','change'].forEach(evt=>{
+    [fullName, university, major, grade, interests, email, phone, linkedin].forEach(el=>{
+      el.addEventListener(evt, updatePreview);
+    });
+  });
+
+  photoInput.addEventListener('change', async (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    photoName.textContent = `Selected: ${f.name} (${Math.round(f.size/1024)} KB)`;
+    try{
+      imageDataURL = await resizeImageToDataURL(f, 256, 0.75);
+      previewAvatar.src = imageDataURL;
+    }catch(err){ photoName.textContent = 'Could not read image.'; }
+  });
+
+  function validate(){
+    let ok = true;
+    Object.values(err).forEach(n=> n.textContent='');
+    if (!sanitize(fullName.value)){ err.name.textContent = 'Full name is required.'; ok=false; }
+    if (!sanitize(university.value)){ err.university.textContent = 'University is required.'; ok=false; }
+    if (!sanitize(major.value)){ err.major.textContent = 'Major is required.'; ok=false; }
+    if (!sanitize(grade.value)){ err.grade.textContent = 'Select a grade level.'; ok=false; }
+    const em = sanitize(email.value);
+    if (!em || !/^\S+@\S+\.\S+$/.test(em)){ err.email.textContent = 'Valid email required.'; ok=false; }
+    const ph = sanitize(phone.value);
+    if (!ph || ph.length < 7){ err.phone.textContent = 'Valid phone number required.'; ok=false; }
+    const li = sanitize(linkedin.value);
+    if (!li || !/^https?:\/\/(www\.)?linkedin\.com\/.+/i.test(li)){
+      err.linkedin.textContent = 'Provide a valid LinkedIn profile URL.'; ok=false;
+    }
+    return ok;
+  }
+
+  function buildProfile(){
+    return {
+      n: sanitize(fullName.value),
+      u: sanitize(university.value),
+      m: sanitize(major.value),
+      g: sanitize(grade.value),
+      i: sanitize(interests.value),
+      e: sanitize(email.value),
+      p: sanitize(phone.value),
+      l: sanitize(linkedin.value),
+      img: imageDataURL || ''
+    };
+  }
+
+  function toShareURL(profile){
+    const json = JSON.stringify(profile);
+    const payload = b64urlEncode(json);
+    const base = location.origin + location.pathname;
+    return `${base}#data=${payload}`;
+  }
+
+  function loadFromHash(){
+    const h = location.hash || '';
+    const m = h.match(/#data=([\w\-\_]+)/);
+    if (!m) return null;
+    try{
+      const json = b64urlDecode(m[1]);
+      const obj = JSON.parse(json);
+      return obj;
+    }catch(e){ return null; }
+  }
+
+  function enterEditMode(){
+    modeText.textContent = 'Edit';
+    editView.classList.remove('hidden');
+    readView.classList.add('hidden');
+  }
+
+  function enterReadMode(profile){
+    modeText.textContent = 'View';
+    editView.classList.add('hidden');
+    readView.classList.remove('hidden');
+
+    // Populate card
+    cardName.textContent = profile.n || '';
+    cardMeta.textContent = `${profile.u || ''} • ${profile.m || ''} • ${profile.g || ''}`;
+    cardLinkedIn.href = profile.l || '#';
+    cardLinkedIn.textContent = profile.l || 'LinkedIn';
+    cardEmail.href = profile.e ? `mailto:${profile.e}` : '#';
+    cardEmail.textContent = profile.e || 'Email';
+    cardPhone.textContent = profile.p || '';
+    cardInterests.textContent = profile.i || '';
+    if (profile.img){ cardAvatar.src = profile.img; } else { cardAvatar.removeAttribute('src'); }
+
+    // security: ensure no query params are interpreted; we only read hash
+    // page contains no inputs in view mode → non-editable.
+  }
+
+  function buildVCard(p){
+    // Basic vCard 3.0
+    const esc = s => (s||'').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n');
+    let lines = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      `FN:${esc(p.n)}`,
+      `ORG:${esc(p.u)}`,
+      `TITLE:${esc(p.m)} (${esc(p.g)})`,
+      `EMAIL;TYPE=INTERNET:${esc(p.e)}`,
+      `TEL;TYPE=CELL:${esc(p.p)}`,
+      `URL:${esc(p.l)}`
+    ];
+    if (p.i) lines.push(`NOTE:Interests - ${esc(p.i)}`);
+    lines.push('END:VCARD');
+    return lines.join('\r\n');
+  }
+
+  generateBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    if (!validate()) return;
+    const profile = buildProfile();
+    const url = toShareURL(profile);
+    // Navigate immediately to view-only for UX confirmation
+    location.replace(url);
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    [fullName, university, major, interests, email, phone, linkedin].forEach(el=> el.value='');
+    grade.value='';
+    imageDataURL='';
+    previewAvatar.removeAttribute('src');
+    updatePreview();
+    Object.values(err).forEach(n=> n.textContent='');
+    photoName.textContent='';
+  });
+
+  copyLinkBtn.addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(location.href);
+      copyStatus.textContent = 'Link copied to clipboard.';
+      copyStatus.className = 'hint success';
+      setTimeout(()=>{ copyStatus.textContent=''; }, 2000);
+    }catch(e){
+      copyStatus.textContent = 'Could not copy link.';
+      copyStatus.className = 'hint error';
+    }
+  });
+
+  downloadVcfBtn.addEventListener('click', ()=>{
+    const data = loadFromHash();
+    if (!data) return;
+    const vcf = buildVCard(data);
+    const blob = new Blob([vcf], {type:'text/vcard;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${(data.n||'contact').replace(/\s+/g,'_')}.vcf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // Initialize
+  const profile = loadFromHash();
+  if (profile){ enterReadMode(profile); }
+  else { enterEditMode(); updatePreview(); }
+
+  // If hash changes (e.g., navigation), switch modes accordingly
+  window.addEventListener('hashchange', ()=>{
+    const p = loadFromHash();
+    if (p) enterReadMode(p); else enterEditMode();
+  });
+
+})();
+</script>
 </body>
 </html>
