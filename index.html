@@ -117,189 +117,210 @@
   </script>
 
   <script>
-    // Short keys to reduce payload size:
-    // u = image URL, n = name, ph = phone, em = email, in = interests, li = LinkedIn
-    const $ = sel => document.querySelector(sel);
-    const qs = new URLSearchParams(location.search);
-    const MAX_URL = 482;
+  // Short keys to reduce payload size:
+  // u = image URL, n = name, ph = phone, em = email, in = interests, li = LinkedIn
+  var $ = function(sel){ return document.querySelector(sel); };
+  var qs = new URLSearchParams(location.search);
+  var MAX_URL = 482;
 
-    function sanitize(v){ return (v||"").trim(); }
-    function compactPayload(data){
-      // Remove empties, keep order stable
-      const o = {};
-      if (data.u) o.u = data.u;
-      if (data.n) o.n = data.n;
-      if (data.ph) o.ph = data.ph;
-      if (data.em) o.em = data.em;
-      if (data.in) o.in = data.in;
-      if (data.li) o.li = data.li;
-      return o;
-    }
-    function encodeData(o){
-      const json = JSON.stringify(o);
-      return LZString.compressToEncodedURIComponent(json);
-    }
-    function decodeData(s){
-      const json = LZString.decompressFromEncodedURIComponent(s);
-      return JSON.parse(json);
-    }
-    function buildURL(enc){
-      // Use relative path to keep it short; when copied it’ll be absolute.
-      const base = location.origin + location.pathname;
-      return `${base}?d=${enc}`;
-    }
-    function setLenPill(len){
-      const pill = $('#lenpill');
-      const el = $('#urllen');
-      el.textContent = len;
-      pill.classList.remove('ok','warn','err');
-      if (len === 0) return;
-      if (len <= MAX_URL) pill.classList.add('ok');
-      else if (len <= MAX_URL + 60) pill.classList.add('warn');
-      else pill.classList.add('err');
-    }
-    function validateBasic(){
-      const em = sanitize($('#em').value);
-      const li = sanitize($('#li').value);
-      const u  = sanitize($('#u').value);
-      if (em && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return {ok:false,msg:'Invalid email format.'};
-      if (li && !/^https?:\/\/|^([a-z0-9.-]+\.[a-z]{2,})|^linkedin\.com\//i.test(li)) return {ok:false,msg:'LinkedIn should be a URL or handle.'};
-      if (u && !/^https?:\/\//i.test(u)) return {ok:false,msg:'Profile image must be a URL starting with http(s)://'};
-      return {ok:true};
-    }
-    function renderViewer(data){
-      const v = $('#viewer'), g = $('#generator');
-      g.classList.add('hide'); v.classList.remove('hide');
-      const av = $('#av');
-      if (data.u) av.style.backgroundImage = `url("${data.u}")`;
-      else av.style.backgroundImage = 'linear-gradient(135deg,#0d1320,#0a0f15)';
-      const vc = $('#vc');
-      vc.innerHTML = '';
-      function row(label, value, isLink){
-        if (!value) return;
-        const div = document.createElement('div');
-        div.className = 'vrow';
-        const k = document.createElement('div');
-        k.className='k'; k.textContent = label;
-        const v = document.createElement('div');
-        if (isLink){
-          const a = document.createElement('a');
-          a.href = value.startsWith('http') ? value : ('https://' + value.replace(/^\/\//,''));
-          a.target = '_blank'; a.rel='noopener';
-          a.textContent = value;
-          v.appendChild(a);
-        } else {
-          v.textContent = value;
-        }
-        div.appendChild(k); div.appendChild(v);
-        vc.appendChild(div);
+  function sanitize(v){ return (v||"").trim(); }
+  function compactPayload(data){
+    var o = {};
+    if (data.u) o.u = data.u;
+    if (data.n) o.n = data.n;
+    if (data.ph) o.ph = data.ph;
+    if (data.em) o.em = data.em;
+    if (data.in) o.in = data.in;
+    if (data.li) o.li = data.li;
+    return o;
+  }
+  function encodeData(o){
+    var json = JSON.stringify(o);
+    return LZString.compressToEncodedURIComponent(json);
+  }
+  function decodeData(s){
+    var json = LZString.decompressFromEncodedURIComponent(s);
+    return JSON.parse(json);
+  }
+  function buildURL(enc){
+    var base = location.origin + location.pathname.replace(/index\.html$/,'');
+    return base + '?d=' + enc;
+  }
+  function setLenPill(len){
+    var pill = $('#lenpill');
+    var el = $('#urllen');
+    el.textContent = String(len || 0);
+    pill.classList.remove('ok','warn','err');
+    if (!len) return;
+    if (len <= MAX_URL) pill.classList.add('ok');
+    else if (len <= MAX_URL + 60) pill.classList.add('warn');
+    else pill.classList.add('err');
+  }
+  function validateBasic(){
+    var em = sanitize($('#em').value);
+    var li = sanitize($('#li').value);
+    var u  = sanitize($('#u').value);
+    if (em && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return {ok:false,msg:'Invalid email format.'};
+    if (li && !(/^(https?:\/\/|([a-z0-9.-]+\.[a-z]{2,})|linkedin\.com\/)/i.test(li))) return {ok:false,msg:'LinkedIn should be a URL or handle.'};
+    if (u && !/^https?:\/\//i.test(u)) return {ok:false,msg:'Profile image must be a URL starting with http(s)://'};
+    return {ok:true};
+  }
+  function renderViewer(data){
+    var v = $('#viewer'), g = $('#generator');
+    g.classList.add('hide'); v.classList.remove('hide');
+    var av = $('#av');
+    if (data.u) av.style.backgroundImage = 'url("' + data.u.replace(/"/g,'%22') + '")';
+    else av.style.backgroundImage = 'linear-gradient(135deg,#0d1320,#0a0f15)';
+    var vc = $('#vc');
+    vc.innerHTML = '';
+    function row(label, value, isLink){
+      if (!value) return;
+      var div = document.createElement('div');
+      div.className = 'vrow';
+      var k = document.createElement('div');
+      k.className='k'; k.textContent = label;
+      var valEl = document.createElement('div');
+      if (isLink){
+        var href = value.indexOf('http') === 0 ? value : ('https://' + value.replace(/^\/\//,''));
+        var a = document.createElement('a');
+        a.href = href; a.target = '_blank'; a.rel='noopener';
+        a.textContent = value;
+        valEl.appendChild(a);
+      } else {
+        valEl.textContent = value;
       }
-      row('Full Name', data.n);
-      row('Phone', data.ph);
-      row('Email', data.em ? data.em : '');
-      if (data.em){
-        // Make email link
-        const last = vc.lastElementChild?.lastElementChild;
-        if (last) { last.innerHTML = `<a href="mailto:${data.em}">${data.em}</a>`; }
+      div.appendChild(k); div.appendChild(valEl);
+      vc.appendChild(div);
+    }
+    row('Full Name', data.n);
+    row('Phone', data.ph);
+    row('Email', data.em ? data.em : '');
+    if (data.em){
+      // Make email link without optional chaining
+      var last = vc.lastElementChild;
+      if (last && last.lastElementChild){
+        last.lastElementChild.innerHTML = '<a href="mailto:'+ data.em.replace(/"/g,'%22') +'">'+ data.em +'</a>';
       }
-      row('Interests', data.in);
-      row('LinkedIn', data.li, true);
     }
-    function renderGenerator(){
-      $('#viewer').classList.add('hide');
-      $('#generator').classList.remove('hide');
-    }
+    row('Interests', data.in);
+    row('LinkedIn', data.li, true);
+  }
+  function renderGenerator(){
+    $('#viewer').classList.add('hide');
+    $('#generator').classList.remove('hide');
+  }
 
-    // Mode switch on load
-    (function init(){
-      const d = qs.get('d');
+  // Mode switch on load (with robust error guard)
+  (function init(){
+    try{
+      var d = qs.get('d');
       if (d){
         try {
-          const data = decodeData(d);
+          var data = decodeData(d);
           renderViewer(data);
           return;
         } catch(e){
-          // If decoding fails, fall back to generator with an error hint
           renderGenerator();
-          const out = $('#out');
+          var out = $('#out');
           out.classList.remove('hide');
-          out.innerHTML = `<span class="pill err">Could not read contact data from URL.</span>`;
+          out.innerHTML = '<span class="pill err">Could not read contact data from URL.</span>';
         }
       } else {
         renderGenerator();
       }
-    })();
+    } catch (e){
+      // Surface any init error so the page isn’t a no-op
+      renderGenerator();
+      var out2 = $('#out');
+      out2.classList.remove('hide');
+      out2.innerHTML = '<span class="pill err">Script error: '+ (e && e.message ? e.message : e) +'</span>';
+      console && console.error && console.error(e);
+    }
+  })();
 
-    // Live length indicator as fields change
-    ['u','n','ph','em','in','li'].forEach(id=>{
-      const el = document.getElementById(id);
-      el?.addEventListener('input', ()=>{
-        const chk = validateBasic();
-        const data = compactPayload({
+  // Live length indicator as fields change
+  ['u','n','ph','em','in','li'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function(){
+      try{
+        var data = compactPayload({
           u:sanitize($('#u').value),
           n:sanitize($('#n').value),
           ph:sanitize($('#ph').value),
           em:sanitize($('#em').value),
           in:sanitize($('#in').value),
-          li:sanitize($('#li').value),
+          li:sanitize($('#li').value)
         });
-        try {
-          const enc = encodeData(data);
-          const url = buildURL(enc);
-          setLenPill(url.length);
-        } catch {
-          setLenPill(0);
-        }
-      });
-    });
-
-    // Generate
-    $('#gen').addEventListener('click', ()=>{
-      const val = validateBasic();
-      const out = $('#out'); const copyBtn = $('#copy'); const openBtn = $('#open');
-      if (!val.ok){
-        out.classList.remove('hide');
-        out.innerHTML = `<span class="pill err">${val.msg}</span>`;
-        copyBtn.classList.add('hide'); openBtn.classList.add('hide');
-        return;
+        var enc = encodeData(data);
+        var url = buildURL(enc);
+        setLenPill(url.length);
+      } catch(e){
+        setLenPill(0);
       }
-      const data = compactPayload({
-        u:sanitize($('#u').value),
-        n:sanitize($('#n').value),
-        ph:sanitize($('#ph').value),
-        em:sanitize($('#em').value),
-        in:sanitize($('#in').value),
-        li:sanitize($('#li').value),
-      });
-      const enc = encodeData(data);
-      const url = buildURL(enc);
-      setLenPill(url.length);
-      let status = '';
-      if (url.length <= MAX_URL) status = `<span class="pill ok">OK for NFC (≤ ${MAX_URL})</span>`;
-      else status = `<span class="pill warn">Over ${MAX_URL} chars — shorten optional fields</span>`;
+    });
+  });
+
+  // Generate
+  document.getElementById('gen').addEventListener('click', function(){
+    var val = validateBasic();
+    var out = $('#out'); var copyBtn = $('#copy'); var openBtn = $('#open');
+    if (!val.ok){
       out.classList.remove('hide');
-      out.innerHTML = `${status}<div style="margin-top:8px"></div><strong>URL:</strong><br>${url}`;
+      out.innerHTML = '<span class="pill err">'+ val.msg +'</span>';
+      copyBtn.classList.add('hide'); openBtn.classList.add('hide');
+      return;
+    }
+    var data = compactPayload({
+      u:sanitize($('#u').value),
+      n:sanitize($('#n').value),
+      ph:sanitize($('#ph').value),
+      em:sanitize($('#em').value),
+      in:sanitize($('#in').value),
+      li:sanitize($('#li').value)
+    });
+    try{
+      var enc = encodeData(data);
+      var url = buildURL(enc);
+      setLenPill(url.length);
+      var status = (url.length <= MAX_URL)
+        ? '<span class="pill ok">OK for NFC (≤ ' + MAX_URL + ')</span>'
+        : '<span class="pill warn">Over ' + MAX_URL + ' chars — shorten optional fields</span>';
+      out.classList.remove('hide');
+      out.innerHTML = status + '<div style="margin-top:8px"></div><strong>URL:</strong><br>' + url;
       copyBtn.classList.remove('hide'); openBtn.classList.remove('hide');
-      copyBtn.onclick = async ()=>{
-        try { await navigator.clipboard.writeText(url);
-          copyBtn.textContent = 'Copied!';
-          setTimeout(()=>copyBtn.textContent='Copy URL',1200);
-        } catch(e){
-          alert('Copy failed. Please select and copy manually.');
+      copyBtn.onclick = function(){
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(url).then(function(){
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function(){ copyBtn.textContent = 'Copy URL'; }, 1200);
+          }, function(){
+            alert('Copy failed. Please select and copy manually.');
+          });
+        } else {
+          // Fallback: select and copy via prompt
+          window.prompt('Copy this URL:', url);
         }
       };
-      openBtn.onclick = ()=> window.open(url, '_blank', 'noopener');
-    });
+      openBtn.onclick = function(){ window.open(url, '_blank', 'noopener'); };
+    } catch(e){
+      out.classList.remove('hide');
+      out.innerHTML = '<span class="pill err">Failed to generate URL: '+ (e && e.message ? e.message : e) +'</span>';
+      copyBtn.classList.add('hide'); openBtn.classList.add('hide');
+    }
+  });
 
-    // Clear
-    $('#clear').addEventListener('click', ()=>{
-      ['u','n','ph','em','in','li'].forEach(id=>{ const el = document.getElementById(id); if (el) el.value=''; });
-      $('#out').classList.add('hide');
-      $('#copy').classList.add('hide');
-      $('#open').classList.add('hide');
-      setLenPill(0);
+  // Clear
+  document.getElementById('clear').addEventListener('click', function(){
+    ['u','n','ph','em','in','li'].forEach(function(id){
+      var el = document.getElementById(id); if (el) el.value='';
     });
-  </script>
+    $('#out').classList.add('hide');
+    $('#copy').classList.add('hide');
+    $('#open').classList.add('hide');
+    setLenPill(0);
+  });
+</script>
 </body>
 </html>
 
