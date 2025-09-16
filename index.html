@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Contact Card – Generator & Viewer</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --card: #121821;
+    --muted: #94a3b8;
+    --text: #e5e7eb;
+    --accent: #60a5fa;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --err: #ef4444;
+    --ring: 0 0 0 3px rgba(96,165,250,.25);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: linear-gradient(180deg, #0b0f14, #0e1520 40%, #0b0f14);
+    color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    display: grid; place-items: center; padding: 24px;
+  }
+  .shell { width: 100%; max-width: 880px; }
+  .card {
+    background: radial-gradient(1200px 800px at 0% 0%, #0f172a 0%, #0b0f14 70%) , var(--card);
+    border: 1px solid #1f2937; border-radius: 20px; box-shadow: 0 8px 40px rgba(2,6,23,.6);
+    padding: clamp(18px, 3vw, 28px);
+  }
+  h1 { margin: 0 0 6px; font-size: clamp(20px, 3vw, 28px); letter-spacing: .3px; }
+  p.lead { margin: 0 0 22px; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px){ .grid { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input, textarea {
+    width: 100%; border: 1px solid #243244; background: #0f1420; color: var(--text);
+    border-radius: 12px; padding: 12px 12px; font-size: 14px; outline: none; transition: box-shadow .18s, border-color .18s;
+  }
+  input:focus, textarea:focus { box-shadow: var(--ring); border-color: #2b3f58; }
+  textarea { min-height: 80px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .row3 { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 14px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+  .btn {
+    border: 1px solid #2b3f58; background: #132033; color: var(--text);
+    padding: 10px 14px; border-radius: 12px; font-weight: 600; cursor: pointer;
+  }
+  .btn.primary { background: linear-gradient(90deg, #2563eb, #22d3ee); border: none; color: #0b1220; }
+  .btn.ghost { background: transparent; }
+  .hint { font-size: 12px; color: var(--muted); }
+  .meter { font-size: 13px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; }
+  .pill.ok { background: rgba(34,197,94,.12); color: var(--ok); border: 1px solid rgba(34,197,94,.3); }
+  .pill.warn { background: rgba(245,158,11,.1); color: var(--warn); border: 1px solid rgba(245,158,11,.3); }
+  .pill.err { background: rgba(239,68,68,.1); color: var(--err); border: 1px solid rgba(239,68,68,.3); }
+  .out {
+    margin-top: 12px; background: #0c131e; border: 1px dashed #263247; border-radius: 14px; padding: 10px 12px; word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px;
+  }
+  .divider { height: 1px; background: #1f2937; margin: 16px 0 22px; border: none; }
+  /* Card view */
+  .profile {
+    display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center; margin-bottom: 14px;
+  }
+  @media (max-width: 560px){ .profile { grid-template-columns: 88px 1fr; } }
+  .avatar {
+    width: 112px; height: 112px; border-radius: 16px; background: #101826; border: 1px solid #20314a; object-fit: cover;
+  }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px dashed #233149; }
+  .kv:last-child { border-bottom: 0; }
+  .k { color: var(--muted); font-size: 13px; }
+  .v a { color: var(--accent); text-decoration: none; }
+  footer.note { color: var(--muted); font-size: 12px; margin-top: 16px; }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card" id="mode-form" hidden>
+      <h1>Create your shareable contact card</h1>
+      <p class="lead">Fill this in, then share the generated link. Opening the link shows a read-only card.</p>
+
+      <div class="grid">
+        <div>
+          <label for="name">Full Name</label>
+          <input id="name" maxlength="48" placeholder="Ada Lovelace" />
+        </div>
+        <div>
+          <label for="uni">University</label>
+          <input id="uni" maxlength="48" placeholder="USC" />
+        </div>
+        <div>
+          <label for="major">Major</label>
+          <input id="major" maxlength="36" placeholder="Astronautical Engineering" />
+        </div>
+        <div>
+          <label for="grade">Grade Level</label>
+          <input id="grade" maxlength="20" placeholder="M.S. Candidate" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <div>
+          <label for="interests">Interests <span class="hint">(comma-separated)</span></label>
+          <textarea id="interests" maxlength="120" placeholder="Propulsion, inflatable habitats, kinetic launch"></textarea>
+        </div>
+        <div>
+          <label for="pic">Profile Picture URL <span class="hint">(Google Drive share link OK)</span></label>
+          <input id="pic" maxlength="140" placeholder="https://drive.google.com/..." />
+          <label for="linkedin" style="margin-top:10px">LinkedIn URL</label>
+          <input id="linkedin" maxlength="110" placeholder="https://www.linkedin.com/in/your-handle" />
+        </div>
+      </div>
+
+      <div class="row3" style="margin-top:14px">
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" maxlength="24" placeholder="+1 555 123 4567" />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" maxlength="64" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label for="theme">Theme</label>
+          <input id="theme" maxlength="12" placeholder="default" />
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="actions">
+        <button class="btn primary" id="build">Generate Link</button>
+        <button class="btn" id="copy" disabled>Copy Link</button>
+        <span class="meter" id="meter"></span>
+      </div>
+      <div class="out" id="urlbox" hidden></div>
+      <footer class="note">
+        Tip: To guarantee staying under 428 characters, we limit field lengths and use a compact single parameter.<br/>
+        Your link encodes only what you type—no external storage or server.
+      </footer>
+    </div>
+
+    <div class="card" id="mode-view" hidden>
+      <div class="profile">
+        <img id="v-pic" class="avatar" alt="Profile picture" />
+        <div>
+          <h1 id="v-name">—</h1>
+          <p class="lead" id="v-uni">—</p>
+        </div>
+      </div>
+
+      <div class="kv"><div class="k">Major</div><div class="v" id="v-major">—</div></div>
+      <div class="kv"><div class="k">Grade</div><div class="v" id="v-grade">—</div></div>
+      <div class="kv"><div class="k">Interests</div><div class="v" id="v-interests">—</div></div>
+      <div class="kv"><div class="k">LinkedIn</div><div class="v" id="v-linkedin">—</div></div>
+      <div class="kv"><div class="k">Phone</div><div class="v" id="v-phone">—</div></div>
+      <div class="kv"><div class="k">Email</div><div class="v" id="v-email">—</div></div>
+
+      <footer class="note">This card is read-only. To create your own, open this file without the <code>?d=</code> part.</footer>
+    </div>
+  </div>
+
+<script>
+/* ---------- helpers: base64 for UTF-8 strings ---------- */
+function utf8ToBytes(str){
+  return new TextEncoder().encode(str);
+}
+function bytesToUtf8(bytes){
+  return new TextDecoder().decode(bytes);
+}
+function base64Encode(str){
+  const bytes = utf8ToBytes(str);
+  let binary = "";
+  for (let i=0;i<bytes.length;i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary).replace(/=+$/,''); // trim padding to shorten
+}
+function base64Decode(b64){
+  // restore missing padding if trimmed
+  const pad = b64.length % 4 ? 4 - (b64.length % 4) : 0;
+  b64 = b64 + "=".repeat(pad);
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return bytesToUtf8(bytes);
+}
+/* ---------- compact payload packing ---------- */
+function pack(fields){
+  // Order: name|uni|major|grade|interests|linkedin|phone|email|pic|theme
+  const raw = [
+    fields.name || "", fields.uni || "", fields.major || "", fields.grade || "",
+    fields.interests || "", fields.linkedin || "", fields.phone || "", fields.email || "",
+    fields.pic || "", fields.theme || ""
+  ].join("|");
+  return base64Encode(raw);
+}
+function unpack(b64){
+  const raw = base64Decode(b64);
+  const parts = raw.split("|");
+  const [name, uni, major, grade, interests, linkedin, phone, email, pic, theme] =
+    [...parts, "", "", "", "", "", "", "", "", "", ""].slice(0,10);
+  return { name, uni, major, grade, interests, linkedin, phone, email, pic, theme };
+}
+/* ---------- URL builder & meter ---------- */
+const LIMIT = 428;
+
+function currentBaseUrl(){
+  // Same file, no query/hash
+  return window.location.origin + window.location.pathname;
+}
+
+function makeUrl(b64){
+  const u = currentBaseUrl() + "?d=" + encodeURIComponent(b64);
+  return u;
+}
+
+function measureUrlLength(url){
+  // Count characters as displayed (what the browser address bar would show)
+  return url.length;
+}
+
+function setMeter(len){
+  const m = document.getElementById("meter");
+  const diff = LIMIT - len;
+  let cls = "pill ok";
+  let txt = `URL length: ${len} / ${LIMIT} ✓`;
+  if (diff <= 25 && diff >= 0){ cls = "pill warn"; txt = `URL length: ${len} / ${LIMIT} (close)`; }
+  if (diff < 0){ cls = "pill err"; txt = `URL too long: ${len} / ${LIMIT}`; }
+  m.className = "meter " + cls; m.textContent = txt;
+}
+
+function readForm(){
+  const g = id => document.getElementById(id).value.trim();
+  return {
+    name: g("name"),
+    uni: g("uni"),
+    major: g("major"),
+    grade: g("grade"),
+    interests: g("interests"),
+    linkedin: g("linkedin"),
+    phone: g("phone"),
+    email: g("email"),
+    pic: g("pic"),
+    theme: g("theme")
+  };
+}
+
+function sanitize(f){
+  // very light checks to avoid extreme growth or invalids that balloon the URL
+  const emailOK = !f.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
+  const phoneOK = !f.phone || /^[\d+()\-\s\.]{3,}$/.test(f.phone);
+  const linkOK = !f.linkedin || /^https?:\/\/\S+$/i.test(f.linkedin);
+  const picOK = !f.pic || /^https?:\/\/\S+$/i.test(f.pic);
+  return emailOK && phoneOK && linkOK && picOK;
+}
+
+/* ---------- UI: modes ---------- */
+function qs(name){
+  const p = new URLSearchParams(window.location.search);
+  return p.get(name);
+}
+
+function show(id){ document.getElementById(id).hidden = false; }
+function hide(id){ document.getElementById(id).hidden = true; }
+
+/* ---------- hydrate viewer ---------- */
+function setTheme(theme){
+  // a simple hook; you can add more styles per theme if desired
+  if (!theme) return;
+  if (theme === "light"){
+    document.documentElement.style.setProperty('--bg', '#f8fafc');
+    document.documentElement.style.setProperty('--card', '#ffffff');
+    document.documentElement.style.setProperty('--text', '#0b1220');
+    document.documentElement.style.setProperty('--muted', '#475569');
+  }
+}
+
+function hydrateViewer(data){
+  setTheme(data.theme);
+  const set = (id, val) => document.getElementById(id).textContent = val || "—";
+  const linkOut = (id, href, text) => {
+    const el = document.getElementById(id);
+    el.innerHTML = href ? `<a href="${href}" target="_blank" rel="noopener">${text||href}</a>` : "—";
+  };
+  const img = document.getElementById("v-pic");
+  img.src = data.pic || "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='112' height='112'><rect width='100%' height='100%' fill='#0f1420'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#94a3b8' font-family='sans-serif' font-size='12'>No Image</text></svg>`);
+  img.alt = data.name ? `${data.name}'s photo` : "Profile picture";
+
+  set("v-name", data.name);
+  set("v-uni", data.uni);
+  set("v-major", data.major);
+  set("v-grade", data.grade);
+  set("v-interests", data.interests);
+  linkOut("v-linkedin", data.linkedin, "LinkedIn");
+  set("v-phone", data.phone);
+  set("v-email", data.email);
+}
+
+/* ---------- main ---------- */
+(function init(){
+  const d = qs("d");
+  if (d){
+    // VIEW MODE
+    hide("mode-form"); show("mode-view");
+    try {
+      const data = unpack(decodeURIComponent(d));
+      hydrateViewer(data);
+    } catch (e){
+      document.getElementById("mode-view").innerHTML = "<h1>Invalid link</h1><p class='lead'>The data parameter couldn't be decoded.</p>";
+    }
+    return;
+  }
+  // FORM MODE
+  show("mode-form");
+  const buildBtn = document.getElementById("build");
+  const copyBtn  = document.getElementById("copy");
+  const urlBox   = document.getElementById("urlbox");
+  const inputs = Array.from(document.querySelectorAll("input, textarea"));
+
+  function updateMeterPreview(){
+    const f = readForm();
+    const b64 = pack(f);
+    const url = makeUrl(b64);
+    const len = measureUrlLength(url);
+    setMeter(len);
+    urlBox.hidden = false;
+    urlBox.textContent = url;
+    copyBtn.disabled = len > LIMIT;
+  }
+
+  inputs.forEach(el => el.addEventListener("input", updateMeterPreview));
+  updateMeterPreview();
+
+  buildBtn.addEventListener("click", () => {
+    const f = readForm();
+    if (!sanitize(f)){
+      setMeter(LIMIT+1);
+      alert("Please fix invalid fields (email, phone, or URLs).");
+      return;
+    }
+    const url = makeUrl(pack(f));
+    const len = measureUrlLength(url);
+    setMeter(len);
+    urlBox.hidden = false;
+    urlBox.textContent = url;
+    if (len > LIMIT){
+      alert(`URL too long (${len} chars). Please shorten a field (e.g., LinkedIn handle or photo link).`);
+      return;
+    }
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    const text = urlBox.textContent.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = "Copied!";
+      setTimeout(()=> copyBtn.textContent = "Copy Link", 1200);
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta);
+      copyBtn.textContent = "Copied!";
+      setTimeout(()=> copyBtn.textContent = "Copy Link", 1200);
+    }
+  });
+})();
+</script>
+</body>
+</html>
