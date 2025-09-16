@@ -1,325 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NFC Contact Link • Generator & Viewer</title>
-  <meta name="description" content="Create a compact NFC URL that renders a view-only contact card." />
-  <style>
-    :root{
-      --bg: #0b0f14; --card:#121821; --muted:#7b8794; --text:#e6edf3; --accent:#4cc9f0; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444; --border:#263041;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial; background:linear-gradient(180deg,#0b0f14,#0a0d11); color:var(--text); min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px}
-    .wrap{width:100%; max-width:980px}
-    .card{background:linear-gradient(180deg,#121821,#0f141c); border:1px solid var(--border); border-radius:20px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    h1{margin:0 0 8px; font-size:1.6rem; letter-spacing:.3px}
-    p.sub{margin:0 0 20px; color:var(--muted)}
-    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-    .grid-1{grid-template-columns:1fr}
-    label{display:block; font-size:.9rem; color:#b7c2cc; margin:8px 0 6px}
-    input, textarea{width:100%; border:1px solid var(--border); background:#0c1117; color:var(--text); padding:12px 14px; border-radius:12px; outline:none}
-    input:focus, textarea:focus{border-color:#334155; box-shadow:0 0 0 3px rgba(76,201,240,.15)}
-    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
-    button{background:var(--accent); color:#05141f; border:0; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer}
-    button.secondary{background:#17202b; color:#cfe8ff; border:1px solid var(--border)}
-    .out{margin-top:16px; padding:12px; border:1px dashed var(--border); border-radius:12px; word-break:break-all; background:#0a0f15}
-    .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background:#0f1722; border:1px solid var(--border); color:#bcd0e0; font-size:.85rem}
-    .pill.ok{border-color:#1f5130; color:#86efac; background:#0e1a12}
-    .pill.warn{border-color:#5b440f; color:#facc15; background:#161206}
-    .pill.err{border-color:#5b1b1b; color:#fca5a5; background:#170b0b}
-    .split{display:grid; grid-template-columns: 260px 1fr; gap:20px}
-    .viewer{display:flex; gap:16px; align-items:stretch}
-    .avatar{width:220px; min-width:220px; aspect-ratio:1/1; border-radius:16px; background:#0a0f15 center/cover no-repeat; border:1px solid var(--border)}
-    .vcard{padding:4px}
-    .vrow{display:flex; align-items:center; gap:10px; margin:8px 0; color:#d7e0ea}
-    .k{width:110px; color:#9fb0c1}
-    a{color:#7dd3fc; text-decoration:none}
-    a:hover{text-decoration:underline}
-    .footer{margin-top:16px; color:#9fb0c1}
-    .hide{display:none !important}
-    .small{font-size:.9rem}
-    @media (max-width:900px){ .split{grid-template-columns:1fr} .viewer{flex-direction:column} .avatar{width:100%; min-width:unset} }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NFC Contact Card Generator</title>
+<style>
+  :root { color-scheme: light dark; --bg:#0b0b0c; --card:#141417; --ink:#eaeaf0; --muted:#9aa0aa; --accent:#4f8cff; --ok:#2fbf71; --bad:#ff6b6b; --border:#2a2a33; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+  .wrap { max-width: 840px; margin: 40px auto; padding: 0 16px; }
+  h1 { font-size: 1.6rem; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .full { grid-column: 1 / -1; }
+  label { font-size: .9rem; color: var(--muted); display:block; margin-bottom:6px; }
+  input, select, textarea {
+    width: 100%; background: var(--card); color: var(--ink); border: 1px solid var(--border);
+    padding: 10px 12px; border-radius:12px; outline: none; font-size: 0.95rem;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  .btn {
+    display:inline-flex; align-items:center; gap:8px; padding: 10px 14px; border-radius:12px; border:1px solid var(--border);
+    background: #1c1c22; color: var(--ink); cursor:pointer; font-weight:600; text-decoration:none;
+  }
+  .btn.primary { background: var(--accent); color:white; border-color: transparent; }
+  .btn.ghost { background: transparent; }
+  .row { display:flex; gap:10px; flex-wrap: wrap; align-items: center; }
+  .note { color: var(--muted); font-size: 0.9rem; }
+  .card {
+    background: linear-gradient(180deg, #17171c, #121217);
+    border: 1px solid var(--border); border-radius: 16px; padding: 18px; display:flex; gap:16px; align-items:center;
+  }
+  .avatar { width: 96px; height: 96px; border-radius: 12px; object-fit: cover; border:1px solid var(--border); background:#0e0e12; }
+  .kv { display:grid; grid-template-columns: 120px 1fr; gap: 8px 12px; margin-top:8px; }
+  .k { color: var(--muted); }
+  .v a { color: var(--accent); text-decoration:none; }
+  .pill { display:inline-block; padding: 2px 8px; border:1px solid var(--border); border-radius:999px; margin: 0 6px 6px 0; font-size:.85rem; color: var(--ink); }
+  .hidden { display:none !important; }
+  .len { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+  .footer { margin-top: 16px; font-size: .85rem; color: var(--muted); }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div id="generator">
-        <h1>NFC Contact URL Generator</h1>
-        <p class="sub">Enter your details. We’ll produce a compact, URL-safe link (&lt; 482 chars) that opens a <strong>view-only</strong> contact card.</p>
+<div class="wrap">
+  <h1>NFC Contact Card</h1>
 
-        <div class="grid">
-          <div>
-            <label for="u">Profile Image URL (optional)</label>
-            <input id="u" placeholder="https://... (use a short image URL)" />
-          </div>
-          <div>
-            <label for="n">Full Name</label>
-            <input id="n" placeholder="Ada Lovelace" />
-          </div>
-          <div>
-            <label for="ph">Phone</label>
-            <input id="ph" placeholder="+1 555 867 5309" />
-          </div>
-          <div>
-            <label for="em">Email</label>
-            <input id="em" placeholder="ada@example.com" />
-          </div>
-          <div class="grid-1">
-            <label for="li">LinkedIn</label>
-            <input id="li" placeholder="linkedin.com/in/your-handle (short is best)" />
-          </div>
-          <div class="grid-1">
-            <label for="in">Interests (comma-separated, optional)</label>
-            <input id="in" placeholder="Propulsion, Avionics, CFD" />
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:16px">
-          <button id="gen">Generate URL</button>
-          <button id="clear" class="secondary">Clear</button>
-          <span id="lenpill" class="pill">Length: <strong id="urllen">0</strong> chars</span>
-        </div>
-
-        <div id="out" class="out hide"></div>
-
-        <div class="row" style="margin-top:10px">
-          <button id="copy" class="secondary hide">Copy URL</button>
-          <button id="open" class="secondary hide">Open Preview</button>
-        </div>
-
-        <p class="footer small">Tip: To keep the URL under 482 characters, prefer a short LinkedIn handle and a concise Interests list.</p>
+  <!-- Generator Panel -->
+  <section id="generator">
+    <p class="note">Paste a <strong>Postimg direct link</strong> (ends with an image extension), fill details, then generate your shareable, view-only URL for your NFC tag.</p>
+    <div class="grid">
+      <div class="full">
+        <label for="img">Profile picture (Postimg direct link)</label>
+        <input id="img" type="url" placeholder="https://i.postimg.cc/xxxxxx/your-photo.jpg" />
       </div>
 
-      <div id="viewer" class="hide">
-        <h1>Contact Card</h1>
-        <p class="sub">View-only</p>
-        <div class="split">
-          <div class="avatar" id="av"></div>
-          <div class="vcard" id="vc">
-            <!-- Filled by JS -->
-          </div>
+      <div>
+        <label for="name">Full name</label>
+        <input id="name" type="text" placeholder="Ada Lovelace" />
+      </div>
+      <div>
+        <label for="grade">Grade level</label>
+        <select id="grade">
+          <option value="">Select…</option>
+          <option value="Undergrad">Undergrad</option>
+          <option value="Masters">Masters</option>
+          <option value="PhD">PhD</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="univ">University</label>
+        <input id="univ" type="text" placeholder="University of Example" />
+      </div>
+      <div>
+        <label for="major">Major</label>
+        <input id="major" type="text" placeholder="Aerospace Engineering" />
+      </div>
+
+      <div>
+        <label for="phone">Phone</label>
+        <input id="phone" type="tel" placeholder="+1 555-123-4567" />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.edu" />
+      </div>
+
+      <div class="full">
+        <label for="interests">Interests (comma-separated)</label>
+        <textarea id="interests" placeholder="Propulsion, Systems Engineering, Robotics"></textarea>
+      </div>
+
+      <div class="full">
+        <label for="linkedin">LinkedIn URL</label>
+        <input id="linkedin" type="url" placeholder="https://www.linkedin.com/in/your-handle/" />
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="btn primary" id="generateBtn">Generate URL</button>
+      <button class="btn ghost" id="clearBtn" type="button">Clear</button>
+      <span class="note">Length: <span id="len" class="len">0</span> / 482</span>
+    </div>
+
+    <div id="result" class="row" style="margin-top:12px; gap:8px;">
+      <input id="urlOut" readonly style="flex:1; min-width: 260px; background: var(--card); color: var(--ink); border:1px solid var(--border); padding:10px 12px; border-radius:12px;" />
+      <button class="btn" id="copyBtn" type="button">Copy</button>
+    </div>
+
+    <p class="note footer" id="assist">
+      Tip: If your link is too long, shorten “Interests”, university, or major wording. The data is compressed into the hash (<code>#</code>) so the page is always view-only when shared.
+    </p>
+  </section>
+
+  <!-- Viewer Panel (read-only card) -->
+  <section id="viewer" class="hidden">
+    <div id="card" class="card">
+      <img id="v_img" class="avatar" alt="Profile" src="" onerror="this.src=''; this.style.display='none';" />
+      <div style="flex:1;">
+        <div style="display:flex; align-items:baseline; gap:10px; flex-wrap: wrap;">
+          <div id="v_name" style="font-size:1.25rem; font-weight:700;"></div>
+          <div id="v_grade" class="pill"></div>
         </div>
-        <div class="row" style="margin-top:16px">
-          <a id="backlink" class="pill" href="./">← Create your own</a>
+        <div class="kv">
+          <div class="k">University</div><div class="v" id="v_univ"></div>
+          <div class="k">Major</div>    <div class="v" id="v_major"></div>
+          <div class="k">Phone</div>    <div class="v" id="v_phone"></div>
+          <div class="k">Email</div>    <div class="v" id="v_email"></div>
+          <div class="k">LinkedIn</div> <div class="v" id="v_linkedin"></div>
+        </div>
+        <div id="v_interests_wrap" style="margin-top:10px;">
+          <div class="k" style="margin-bottom:6px;">Interests</div>
+          <div id="v_interests"></div>
         </div>
       </div>
     </div>
-  </div>
+    <p class="note footer">This card is view-only. To create your own, open the page without the <code>#…</code> part.</p>
+  </section>
+</div>
 
-  <!-- LZ-String (minimal build: compressToEncodedURIComponent / decompressFromEncodedURIComponent) -->
-  <script>
-  /* LZ-String 1.4.4 (URL-encoded only) – https://github.com/pieroxy/lz-string – MIT
-     Trimmed to only the two functions we use to keep things light. */
-  var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},e={compressToEncodedURIComponent:function(o){return null==o?"":e._compress(o,6,function(o){return n.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:e._decompress(r.length,32,function(t){return o(n,r.charAt(t))})},_compress:function(o,n,t){if(null==o)return"";var e,i,u,s={},a={},c="",p="",l="",f=2,h=3,d=2,v=[],g=0,m=0;for(i=0;i<o.length;i+=1)if(c=o.charAt(i),Object.prototype.hasOwnProperty.call(s,c)||(s[c]=h++,a[c]=!0),p=l+c,Object.prototype.hasOwnProperty.call(s,p))l=p;else{if(Object.prototype.hasOwnProperty.call(a,l)){if(l.charCodeAt(0)<256){for(e=0;e<d;e++)g<<=1,m==n-1?(m=0,v.push(t(g)),g=0):m++;for(u=l.charCodeAt(0),e=0;e<8;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}else{for(u=1,e=0;e<d;e++)g=g<<1|u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u=0;for(u=l.charCodeAt(0),e=0;e<16;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}f--,0==f&&(f=Math.pow(2,d),d++),delete a[l]}else for(u=s[l],e=0;e<d;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1;f--,0==f&&(f=Math.pow(2,d),d++),s[p]=h++,l=String(c)}if(""!==l){if(Object.prototype.hasOwnProperty.call(a,l)){if(l.charCodeAt(0)<256){for(e=0;e<d;e++)g<<=1,m==n-1?(m=0,v.push(t(g)),g=0):m++;for(u=l.charCodeAt(0),e=0;e<8;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}else{for(u=1,e=0;e<d;e++)g=g<<1|u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u=0;for(u=l.charCodeAt(0),e=0;e<16;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}f--,0==f&&(f=Math.pow(2,d),d++),delete a[l]}else for(u=s[l],e=0;e<d;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1;f--,0==f&&(f=Math.pow(2,d),d++)}for(u=2,e=0;e<d;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1;for(;;){if(g<<=1,m==n-1){v.push(t(g));break}m++}return v.join("")},_decompress:function(o,n,t){var e,i,u,s,a,c,p,l,f,h=[],d=4,v=4,g=3,m="",w=[],C={val:t(0),position:n,index:1};for(i=0;i<3;i+=1)h[i]=i;for(a=0,c=Math.pow(2,2),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;switch(a){case 0:for(a=0,c=Math.pow(2,8),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;f=r(a);break;case 1:for(a=0,c=Math.pow(2,16),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;f=r(a);break;case 2:return""}for(h[3]=f,l=f,w.push(f);;){if(C.index>o)return"";for(a=0,c=Math.pow(2,g),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;switch(u=a){case 0:for(a=0,c=Math.pow(2,8),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;h[v++]=r(a),u=d-1,g=2;break;case 1:for(a=0,c=Math.pow(2,16),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;h[v++]=r(a),u=d-1,g=2;break;case 2:return w.join("")}if(d=u+1, h[u])m=h[u];else{if(u!==v)return null;m=l+l.charAt(0)}w.push(m),h[v++]=l+m.charAt(0),l=m,0==--g&&(g=Math.pow(2,++e))}}
-  }();
-  </script>
+<script>
+/*! LZ-String (MIT) – compressToEncodedURIComponent / decompressFromEncodedURIComponent (minified) */
+var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},e={compressToEncodedURIComponent:function(r){return null==r?"":e._compress(r,6,function(o){return n.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:e._decompress(r.length,32,function(t){return o(n,r.charAt(t))})},_compress:function(o,n,t){if(null==o)return"";var e,i,s,p={},u={},c="",a="",l="",f=2,h=3,d=2,m=[],v=0,g=0;for(i=0;i<o.length;i+=1)if(c=o.charAt(i),Object.prototype.hasOwnProperty.call(p,c)||(p[c]=h++,u[c]=!0),a=l+c,Object.prototype.hasOwnProperty.call(p,a))l=a;else{if(Object.prototype.hasOwnProperty.call(u,l)){if(l.charCodeAt(0)<256){for(e=0;e<d;e++)v<<=1,g==n-1?(g=0,m.push(t(v)),v=0):g++;for(s=l.charCodeAt(0),e=0;e<8;e++)v=v<<1|1&s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s>>=1}else{for(s=1,e=0;e<d;e++)v=v<<1|s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s=0;for(s=l.charCodeAt(0),e=0;e<16;e++)v=v<<1|1&s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s>>=1}f--,0==f&&(f=Math.pow(2,d),d++),delete u[l]}else for(s=p[l],e=0;e<d;e++)v=v<<1|1&s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s>>=1;f--,0==f&&(f=Math.pow(2,d),d++),p[a]=h++,l=String(c)}if(""!==l){if(Object.prototype.hasOwnProperty.call(u,l)){if(l.charCodeAt(0)<256){for(e=0;e<d;e++)v<<=1,g==n-1?(g=0,m.push(t(v)),v=0):g++;for(s=l.charCodeAt(0),e=0;e<8;e++)v=v<<1|1&s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s>>=1}else{for(s=1,e=0;e<d;e++)v=v<<1|s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s=0;for(s=l.charCodeAt(0),e=0;e<16;e++)v=v<<1|1&s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s>>=1}f--,0==f&&(f=Math.pow(2,d),d++),delete u[l]}else for(s=p[l],e=0;e<d;e++)v=v<<1|1&s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s>>=1;f--,0==f&&(f=Math.pow(2,d),d++)}for(s=2,e=0;e<d;e++)v=v<<1|s,g==n-1?(g=0,m.push(t(v)),v=0):g++,s=0;for(;;){if(v<<=1,g==n-1){m.push(t(v));break}g++}return m.join("")},_decompress:function(o,n,t){var e,i,s,p,u,c,a,l,f=[],h=4,d=4,m=3,v="",g=[],w={val:t(0),position:n,index:1};for(i=0;i<3;i+=1)f[i]=i;for(s=0,u=Math.pow(2,2),c=1;c!=u;)p=w.val&w.position,w.position>>=1,0==w.position&&(w.position=n,w.val=t(w.index++)),s|=(p>0?1:0)*c,c<<=1;switch(e=s){case 0:for(s=0,u=Math.pow(2,8),c=1;c!=u;)p=w.val&w.position,w.position>>=1,0==w.position&&(w.position=n,w.val=t(w.index++)),s|=(p>0?1:0)*c,c<<=1;a=r(s);break;case 1:for(s=0,u=Math.pow(2,16),c=1;c!=u;)p=w.val&w.position,w.position>>=1,0==w.position&&(w.position=n,w.val=t(w.index++)),s|=(p>0?1:0)*c,c<<=1;a=r(s);break;case 2:return""}for(f[3]=a,l=a,g.push(a);;){if(w.index>o)return"";for(s=0,u=Math.pow(2,m),c=1;c!=u;)p=w.val&w.position,w.position>>=1,0==w.position&&(w.position=n,w.val=t(w.index++)),s|=(p>0?1:0)*c,c<<=1;switch(a=s){case 0:for(s=0,u=Math.pow(2,8),c=1;c!=u;)p=w.val&w.position,w.position>>=1,0==w.position&&(w.position=n,w.val=t(w.index++)),s|=(p>0?1:0)*c,c<<=1;f[d++]=r(s),a=d-1,h--;break;case 1:for(s=0,u=Math.pow(2,16),c=1;c!=u;)p=w.val&w.position,w.position>>=1,0==w.position&&(w.position=n,w.val=t(w.index++)),s|=(p>0?1:0)*c,c<<=1;f[d++]=r(s),a=d-1,h--;break;case 2:return g.join("")}if(0==h&&(h=Math.pow(2,m),m++),f[a])v=f[a];else{if(a!==d)return null;v=l+l.charAt(0)}g.push(v),f[d++]=l+v.charAt(0),h--,l=v,0==h&&(h=Math.pow(2,m),m++)}}
+};return e}();
+</script>
 
-  <script>
-  // Short keys to reduce payload size:
-  // u = image URL, n = name, ph = phone, em = email, in = interests, li = LinkedIn
-  var $ = function(sel){ return document.querySelector(sel); };
-  var qs = new URLSearchParams(location.search);
-  var MAX_URL = 482;
+<script>
+const el = id => document.getElementById(id);
+const formIds = ["img","name","univ","major","grade","phone","email","interests","linkedin"];
 
-  function sanitize(v){ return (v||"").trim(); }
-  function compactPayload(data){
-    var o = {};
-    if (data.u) o.u = data.u;
-    if (data.n) o.n = data.n;
-    if (data.ph) o.ph = data.ph;
-    if (data.em) o.em = data.em;
-    if (data.in) o.in = data.in;
-    if (data.li) o.li = data.li;
-    return o;
-  }
-  function encodeData(o){
-    var json = JSON.stringify(o);
-    return LZString.compressToEncodedURIComponent(json);
-  }
-  function decodeData(s){
-    var json = LZString.decompressFromEncodedURIComponent(s);
-    return JSON.parse(json);
-  }
-  function buildURL(enc){
-    var base = location.origin + location.pathname.replace(/index\.html$/,'');
-    return base + '?d=' + enc;
-  }
-  function setLenPill(len){
-    var pill = $('#lenpill');
-    var el = $('#urllen');
-    el.textContent = String(len || 0);
-    pill.classList.remove('ok','warn','err');
-    if (!len) return;
-    if (len <= MAX_URL) pill.classList.add('ok');
-    else if (len <= MAX_URL + 60) pill.classList.add('warn');
-    else pill.classList.add('err');
-  }
-  function validateBasic(){
-    var em = sanitize($('#em').value);
-    var li = sanitize($('#li').value);
-    var u  = sanitize($('#u').value);
-    if (em && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return {ok:false,msg:'Invalid email format.'};
-    if (li && !(/^(https?:\/\/|([a-z0-9.-]+\.[a-z]{2,})|linkedin\.com\/)/i.test(li))) return {ok:false,msg:'LinkedIn should be a URL or handle.'};
-    if (u && !/^https?:\/\//i.test(u)) return {ok:false,msg:'Profile image must be a URL starting with http(s)://'};
-    return {ok:true};
-  }
-  function renderViewer(data){
-    var v = $('#viewer'), g = $('#generator');
-    g.classList.add('hide'); v.classList.remove('hide');
-    var av = $('#av');
-    if (data.u) av.style.backgroundImage = 'url("' + data.u.replace(/"/g,'%22') + '")';
-    else av.style.backgroundImage = 'linear-gradient(135deg,#0d1320,#0a0f15)';
-    var vc = $('#vc');
-    vc.innerHTML = '';
-    function row(label, value, isLink){
-      if (!value) return;
-      var div = document.createElement('div');
-      div.className = 'vrow';
-      var k = document.createElement('div');
-      k.className='k'; k.textContent = label;
-      var valEl = document.createElement('div');
-      if (isLink){
-        var href = value.indexOf('http') === 0 ? value : ('https://' + value.replace(/^\/\//,''));
-        var a = document.createElement('a');
-        a.href = href; a.target = '_blank'; a.rel='noopener';
-        a.textContent = value;
-        valEl.appendChild(a);
-      } else {
-        valEl.textContent = value;
-      }
-      div.appendChild(k); div.appendChild(valEl);
-      vc.appendChild(div);
-    }
-    row('Full Name', data.n);
-    row('Phone', data.ph);
-    row('Email', data.em ? data.em : '');
-    if (data.em){
-      // Make email link without optional chaining
-      var last = vc.lastElementChild;
-      if (last && last.lastElementChild){
-        last.lastElementChild.innerHTML = '<a href="mailto:'+ data.em.replace(/"/g,'%22') +'">'+ data.em +'</a>';
-      }
-    }
-    row('Interests', data.in);
-    row('LinkedIn', data.li, true);
-  }
-  function renderGenerator(){
-    $('#viewer').classList.add('hide');
-    $('#generator').classList.remove('hide');
-  }
+function packData() {
+  const data = {
+    // short keys to keep payload tiny
+    i: el("img").value.trim(),
+    n: el("name").value.trim(),
+    u: el("univ").value.trim(),
+    m: el("major").value.trim(),
+    g: el("grade").value.trim(),
+    p: el("phone").value.trim(),
+    e: el("email").value.trim(),
+    s: el("interests").value.trim(),
+    l: el("linkedin").value.trim()
+  };
+  // minimal sanity
+  if (!data.n) { alert("Please enter your full name."); return null; }
+  if (data.l && !/^https?:\/\//i.test(data.l)) data.l = "https://" + data.l;
+  if (data.i && !/^https?:\/\//i.test(data.i)) data.i = "https://" + data.i;
+  return data;
+}
 
-  // Mode switch on load (with robust error guard)
-  (function init(){
-    try{
-      var d = qs.get('d');
-      if (d){
-        try {
-          var data = decodeData(d);
-          renderViewer(data);
-          return;
-        } catch(e){
-          renderGenerator();
-          var out = $('#out');
-          out.classList.remove('hide');
-          out.innerHTML = '<span class="pill err">Could not read contact data from URL.</span>';
-        }
-      } else {
-        renderGenerator();
-      }
-    } catch (e){
-      // Surface any init error so the page isn’t a no-op
-      renderGenerator();
-      var out2 = $('#out');
-      out2.classList.remove('hide');
-      out2.innerHTML = '<span class="pill err">Script error: '+ (e && e.message ? e.message : e) +'</span>';
-      console && console.error && console.error(e);
-    }
-  })();
+function generateUrl() {
+  const data = packData();
+  if (!data) return;
 
-  // Live length indicator as fields change
-  ['u','n','ph','em','in','li'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('input', function(){
-      try{
-        var data = compactPayload({
-          u:sanitize($('#u').value),
-          n:sanitize($('#n').value),
-          ph:sanitize($('#ph').value),
-          em:sanitize($('#em').value),
-          in:sanitize($('#in').value),
-          li:sanitize($('#li').value)
-        });
-        var enc = encodeData(data);
-        var url = buildURL(enc);
-        setLenPill(url.length);
-      } catch(e){
-        setLenPill(0);
-      }
-    });
+  const json = JSON.stringify(data);
+  const compressed = LZString.compressToEncodedURIComponent(json);
+  const base = location.origin + location.pathname.replace(/index\.html?$/i,'');
+  const url = base + "#" + compressed;
+
+  el("urlOut").value = url;
+  updateLen(url);
+
+  if (url.length > 482) {
+    alert("The generated URL is " + url.length + " characters, which exceeds the 482 character limit.\n\nTips:\n• Shorten Interests (use 3–5 keywords)\n• Abbreviate University/Major\n• Remove optional fields like photo/LinkedIn\nThen try again.");
+  }
+}
+
+function updateLen(urlStr) {
+  const L = (urlStr || el("urlOut").value || "").length;
+  const span = el("len");
+  span.textContent = L;
+  span.className = "len " + (L>0 && L <= 482 ? "ok" : (L>482 ? "bad" : ""));
+}
+
+function clearForm() {
+  formIds.forEach(id => { if (el(id)) el(id).value = ""; });
+  el("urlOut").value = "";
+  updateLen("");
+}
+
+function copyUrl() {
+  const v = el("urlOut").value;
+  if (!v) return;
+  navigator.clipboard.writeText(v).then(()=> {
+    const b = el("copyBtn");
+    const orig = b.textContent;
+    b.textContent = "Copied!";
+    setTimeout(()=> b.textContent = orig, 1200);
   });
+}
 
-  // Generate
-  document.getElementById('gen').addEventListener('click', function(){
-    var val = validateBasic();
-    var out = $('#out'); var copyBtn = $('#copy'); var openBtn = $('#open');
-    if (!val.ok){
-      out.classList.remove('hide');
-      out.innerHTML = '<span class="pill err">'+ val.msg +'</span>';
-      copyBtn.classList.add('hide'); openBtn.classList.add('hide');
-      return;
-    }
-    var data = compactPayload({
-      u:sanitize($('#u').value),
-      n:sanitize($('#n').value),
-      ph:sanitize($('#ph').value),
-      em:sanitize($('#em').value),
-      in:sanitize($('#in').value),
-      li:sanitize($('#li').value)
-    });
-    try{
-      var enc = encodeData(data);
-      var url = buildURL(enc);
-      setLenPill(url.length);
-      var status = (url.length <= MAX_URL)
-        ? '<span class="pill ok">OK for NFC (≤ ' + MAX_URL + ')</span>'
-        : '<span class="pill warn">Over ' + MAX_URL + ' chars — shorten optional fields</span>';
-      out.classList.remove('hide');
-      out.innerHTML = status + '<div style="margin-top:8px"></div><strong>URL:</strong><br>' + url;
-      copyBtn.classList.remove('hide'); openBtn.classList.remove('hide');
-      copyBtn.onclick = function(){
-        if (navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(url).then(function(){
-            copyBtn.textContent = 'Copied!';
-            setTimeout(function(){ copyBtn.textContent = 'Copy URL'; }, 1200);
-          }, function(){
-            alert('Copy failed. Please select and copy manually.');
-          });
-        } else {
-          // Fallback: select and copy via prompt
-          window.prompt('Copy this URL:', url);
-        }
-      };
-      openBtn.onclick = function(){ window.open(url, '_blank', 'noopener'); };
-    } catch(e){
-      out.classList.remove('hide');
-      out.innerHTML = '<span class="pill err">Failed to generate URL: '+ (e && e.message ? e.message : e) +'</span>';
-      copyBtn.classList.add('hide'); openBtn.classList.add('hide');
-    }
-  });
+function viewModeFromHash() {
+  if (!location.hash || location.hash.length < 2) return false;
+  try {
+    const compressed = location.hash.slice(1);
+    const json = LZString.decompressFromEncodedURIComponent(compressed);
+    if (!json) return false;
+    const d = JSON.parse(json);
 
-  // Clear
-  document.getElementById('clear').addEventListener('click', function(){
-    ['u','n','ph','em','in','li'].forEach(function(id){
-      var el = document.getElementById(id); if (el) el.value='';
+    // populate viewer
+    const safe = txt => (txt||"").toString();
+    if (d.i) { el("v_img").src = d.i; el("v_img").style.display='block'; } else { el("v_img").style.display='none'; }
+    el("v_name").textContent = safe(d.n);
+    el("v_grade").textContent = safe(d.g || "");
+    el("v_grade").style.display = d.g ? "inline-block" : "none";
+
+    el("v_univ").textContent = safe(d.u);
+    el("v_major").textContent = safe(d.m);
+
+    // phone + email as links if present
+    const phone = safe(d.p);
+    el("v_phone").innerHTML = phone ? `<a href="tel:${phone.replace(/[^\d+]/g,'')}">${phone}</a>` : "";
+
+    const email = safe(d.e);
+    el("v_email").innerHTML = email ? `<a href="mailto:${email}">${email}</a>` : "";
+
+    // LinkedIn link (display compact)
+    const li = safe(d.l);
+    if (li) {
+      const shown = li.replace(/^https?:\/\//i,'').replace(/\/$/,'');
+      el("v_linkedin").innerHTML = `<a href="${li}" rel="noopener noreferrer" target="_blank">${shown}</a>`;
+    } else {
+      el("v_linkedin").textContent = "";
+    }
+
+    // interests as pills
+    const wrap = el("v_interests");
+    wrap.innerHTML = "";
+    const list = safe(d.s).split(/[,;]\s*|\n+/).map(x=>x.trim()).filter(Boolean).slice(0,24);
+    list.forEach(tag => {
+      const span = document.createElement("span");
+      span.className = "pill";
+      span.textContent = tag;
+      wrap.appendChild(span);
     });
-    $('#out').classList.add('hide');
-    $('#copy').classList.add('hide');
-    $('#open').classList.add('hide');
-    setLenPill(0);
-  });
+    el("v_interests_wrap").style.display = list.length ? "block" : "none";
+
+    // toggle panels
+    el("generator").classList.add("hidden");
+    el("viewer").classList.remove("hidden");
+    document.title = (d.n ? d.n + " — " : "") + "Contact Card";
+    return true;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+// Wire up
+el("generateBtn").addEventListener("click", generateUrl);
+el("copyBtn").addEventListener("click", copyUrl);
+el("clearBtn").addEventListener("click", clearForm);
+el("urlOut").addEventListener("input", ()=>updateLen());
+window.addEventListener("hashchange", ()=>{ if (!viewModeFromHash()) location.reload(); });
+
+// If opened with a hash, switch to view mode immediately
+viewModeFromHash();
 </script>
 </body>
 </html>
