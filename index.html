@@ -1,69 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Google Drive Image Link Generator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background: #f8f9fa;
-      text-align: center;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 1em;
-      width: 80%;
-      max-width: 500px;
-    }
-    #output {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fff;
-      border: 1px solid #ccc;
-      display: none;
-    }
-    img {
-      margin-top: 15px;
-      max-width: 100%;
-      height: auto;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Virtual Business Card (URL ≤ 428 chars)</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 24px; }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 1.25rem; margin: 0 0 12px; }
+  fieldset { border: 1px solid #8884; border-radius: 10px; padding: 16px; margin: 0 0 16px; }
+  label { display: block; font-size: .9rem; margin: 10px 0 4px; opacity: .85; }
+  input, textarea { width: 100%; padding: 10px; border: 1px solid #9995; border-radius: 8px; font: inherit; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btns { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 0; }
+  button { padding: 10px 14px; border-radius: 8px; border: 1px solid #0000; cursor: pointer; font: inherit; }
+  .primary { background: #2563eb; color: white; }
+  .secondary { background: #e5e7eb; }
+  .urlbox { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9rem; padding: 10px; border: 1px dashed #8886; border-radius: 8px; word-break: break-all; background: #00000007; }
+  .muted { opacity: .75; font-size: .9rem; }
+  .danger { color: #b91c1c; font-weight: 600; }
+  .card { border: 1px solid #8884; border-radius: 14px; padding: 18px; display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; }
+  .avatar { width: 96px; height: 96px; border-radius: 12px; object-fit: cover; background: #ddd; }
+  .title { font-size: 1.25rem; margin: 0 0 4px; }
+  .sub { margin: 2px 0; }
+  .links a { text-decoration: none; color: #2563eb; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .8rem; background: #00000010; margin: 2px 6px 2px 0; }
+  .hidden { display:none; }
+</style>
 </head>
 <body>
-  <h1>Google Drive Image Embed Generator</h1>
-  <p>Paste your Google Drive share link below:</p>
-  
-  <input type="text" id="driveLink" placeholder="Paste Google Drive share link here">
-  <button onclick="generateLink()">Generate Embed Link</button>
-  
-  <div id="output">
-    <h3>Direct Embed Link:</h3>
-    <input type="text" id="embedLink" readonly style="width:100%">
-    <p>Preview:</p>
-    <img id="preview" alt="Image Preview">
+<div class="wrap">
+  <div id="generator">
+    <h1>Virtual Business Card — URL Generator</h1>
+    <p class="muted">Keep inputs concise. The generated link must be ≤ <b>428</b> characters for your NFC tag.</p>
+    <fieldset>
+      <legend>Contact info</legend>
+      <label for="n">Full Name</label>
+      <input id="n" placeholder="Ada Lovelace" maxlength="80">
+      <div class="row">
+        <div>
+          <label for="p">Phone</label>
+          <input id="p" placeholder="+1 555 123 4567" maxlength="25">
+        </div>
+        <div>
+          <label for="e">Email</label>
+          <input id="e" placeholder="ada@example.com" maxlength="100">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="u">University (short)</label>
+          <input id="u" placeholder="USC" maxlength="40">
+        </div>
+        <div>
+          <label for="m">Major (short)</label>
+          <input id="m" placeholder="Aero" maxlength="40">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="g">Level</label>
+          <input id="g" placeholder="M.S., 1st year" maxlength="40">
+        </div>
+        <div>
+          <label for="l">LinkedIn (username or short URL)</label>
+          <input id="l" placeholder="in/ada" maxlength="60">
+        </div>
+      </div>
+      <label for="i">Interests (comma-separated, keep short)</label>
+      <input id="i" placeholder="Propulsion, EDL systems, LLMs" maxlength="120">
+      <label for="a">Avatar Image URL (optional, keep short)</label>
+      <input id="a" placeholder="https://i.imgur.com/abc123.jpg" maxlength="120">
+      <div class="btns">
+        <button class="primary" id="gen">Generate URL</button>
+        <button class="secondary" id="copy">Copy URL</button>
+        <button class="secondary" id="preview">Preview Card</button>
+      </div>
+    </fieldset>
+    <div class="muted">Base (keep short if you host this file):</div>
+    <input id="base" value="" />
+    <p class="muted" id="hint"></p>
+    <div id="out" class="urlbox">Generated URL will appear here…</div>
+    <p id="len" class="muted">Length: 0</p>
+    <p id="warn" class="danger hidden">⚠️ URL exceeds 428 characters. Shorten your inputs.</p>
+    <p class="muted">How it works: we pack your data with short keys then compress to URL-safe text in <code>#hash</code>. Opening the link renders the contact card; no server needed.</p>
   </div>
-  
-  <script>
-    function generateLink() {
-      const input = document.getElementById("driveLink").value;
-      const match = input.match(/\/d\/([^/]+)\//); // Extract FILE_ID
-      
-      if (!match) {
-        alert("Invalid Google Drive link. Please paste a link like https://drive.google.com/file/d/FILE_ID/view");
-        return;
-      }
-      
-      const fileId = match[1];
-      const embedUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-      
-      document.getElementById("embedLink").value = embedUrl;
-      document.getElementById("preview").src = embedUrl;
-      document.getElementById("output").style.display = "block";
+
+  <div id="viewer" class="hidden">
+    <div class="card">
+      <img id="v_avatar" class="avatar" alt="">
+      <div>
+        <div class="title" id="v_name"></div>
+        <div class="sub" id="v_uni"></div>
+        <div class="sub" id="v_major"></div>
+        <div class="sub" id="v_level"></div>
+        <div class="sub" id="v_phone"></div>
+        <div class="sub" id="v_email"></div>
+        <div class="links" id="v_linkedin"></div>
+        <div id="v_interests" style="margin-top:6px;"></div>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:10px;"><a href="#" onclick="location.hash=''; location.reload()">Create your own</a></p>
+  </div>
+</div>
+
+<script>
+/* Minimal LZ-based URI-safe compressor (subset of lz-string: compressToEncodedURIComponent / decompressFromEncodedURIComponent)
+   Source: https://github.com/pieroxy/lz-string (MIT). Trimmed to necessary functions. */
+var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},e={compressToEncodedURIComponent:function(o){return null==o?"":e._compress(o,6,function(o){return n.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:e._decompress(r.length,32,function(t){return o(n,r.charAt(t))})},_compress:function(o,n,t){if(null==o)return"";var e,i,a={},p={},s="",u="",c="",l=2,f=3,d=2,h=[],m=0,v=0;for(i=0;i<o.length;i+=1)if(s=o.charAt(i),Object.prototype.hasOwnProperty.call(a,s)||(a[s]=f++,p[s]=!0),u=c+s,Object.prototype.hasOwnProperty.call(a,u))c=u;else{if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<d;e++)m<<=1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<8;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}else{for(e=0;e<d;e++)m=m<<1|1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<16;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}l--,0==l&&(l=Math.pow(2,d),d++),delete p[c]}else{for(i=0;i<d;i++)m=m<<1,v==n-1?(v=0,h.push(t(m)),m=0):v++;l--,0==l&&(l=Math.pow(2,d),d++),h.push(t(a[c]))}l--,0==l&&(l=Math.pow(2,d),d++),a[u]=f++,c=String(s)}if(""!==c){if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<d;e++)m<<=1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<8;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}else{for(e=0;e<d;e++)m=m<<1|1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<16;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}l--,0==l&&(l=Math.pow(2,d),d++),delete p[c]}else{for(i=0;i<d;i++)m=m<<1,v==n-1?(v=0,h.push(t(m)),m=0):v++;h.push(t(a[c]))}}for(;;){if(m<<=1,v==n-1){h.push(t(m));break}v++}return h.join("")},_decompress:function(o,n,t){var e,i,a,p,s,u,c,l,f=[],d=4,h=4,m=3,v="",w=[],A={val:t(0),position:n,index:1};for(i=0;i<3;i+=1)f[i]=i;for(p=0,s=Math.pow(2,2),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1;switch(e=p){case 0:for(p=0,s=Math.pow(2,8),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; c=r(p);break;case 1:for(p=0,s=Math.pow(2,16),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; c=r(p);break;case 2:return""}f[3]=c,l=c,w.push(c);for(;A.index<=o;){for(p=0,s=Math.pow(2,m),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1;switch(c=p){case 0:for(p=0,s=Math.pow(2,8),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; f[h++]=r(p),c=h-1,m--;break;case 1:for(p=0,s=Math.pow(2,16),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; f[h++]=r(p),c=h-1,m--;break;case 2:return w.join("")}if(0==m&&(m=Math.pow(2,++v),v=0),f[c])i=f[c];else{if(c!==h)return null;i=l+l.charAt(0)}w.push(i),f[h++]=l+i.charAt(0),l=i; if(0==--m&&(m=Math.pow(2,++v),v=0));}return w.join("")}};return e}();
+
+/* Utility: pick only filled fields and map to short keys */
+function packData() {
+  const get = id => document.getElementById(id).value.trim();
+  const raw = {
+    n: get('n'),  // name
+    p: get('p'),  // phone
+    e: get('e'),  // email
+    l: get('l'),  // linkedin (user or short url)
+    u: get('u'),  // university
+    m: get('m'),  // major
+    g: get('g'),  // grade/level
+    i: get('i'),  // interests
+    a: get('a')   // avatar url
+  };
+  // drop empty fields
+  const packed = {};
+  for (const k in raw) if (raw[k]) packed[k] = raw[k];
+  return packed;
+}
+
+function buildURL() {
+  const baseInput = document.getElementById('base');
+  let base = baseInput.value.trim();
+  if (!base) {
+    // default to the current file (shortened to origin + path without query/hash)
+    const u = new URL(location.href);
+    u.search = '';
+    u.hash = '';
+    base = u.href.replace(/^file:\/\//,''); // keep short; user can replace with their hosted short path
+    baseInput.value = base;
+    document.getElementById('hint').textContent = "Tip: host this file at a short path (e.g., https://x.y/bc) to save characters.";
+  }
+  const packed = packData();
+  const json = JSON.stringify(packed);
+  const hash = LZString.compressToEncodedURIComponent(json);
+  const url = base + '#' + hash;
+  return url;
+}
+
+function showURL() {
+  const url = buildURL();
+  const out = document.getElementById('out');
+  const len = document.getElementById('len');
+  const warn = document.getElementById('warn');
+  out.textContent = url;
+  len.textContent = 'Length: ' + url.length;
+  if (url.length > 428) warn.classList.remove('hidden'); else warn.classList.add('hidden');
+}
+
+function copyURL() {
+  const txt = document.getElementById('out').textContent.trim();
+  if (!txt) return;
+  navigator.clipboard.writeText(txt).then(()=> {
+    alert('URL copied to clipboard.');
+  }, ()=> {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    alert('URL copied to clipboard.');
+  });
+}
+
+function previewCard() {
+  const url = buildURL();
+  location.hash = url.split('#')[1] || '';
+  renderView();
+}
+
+/* Viewer mode */
+function renderView() {
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+  // swap UI
+  document.getElementById('generator').classList.add('hidden');
+  document.getElementById('viewer').classList.remove('hidden');
+  // parse
+  let data = {};
+  try {
+    const json = LZString.decompressFromEncodedURIComponent(hash);
+    data = JSON.parse(json || '{}');
+  } catch(e) { data = {}; }
+  // fill
+  const avatar = document.getElementById('v_avatar');
+  const name = document.getElementById('v_name');
+  const uni  = document.getElementById('v_uni');
+  const major= document.getElementById('v_major');
+  const level= document.getElementById('v_level');
+  const phone= document.getElementById('v_phone');
+  const email= document.getElementById('v_email');
+  const li   = document.getElementById('v_linkedin');
+  const ints = document.getElementById('v_interests');
+
+  function set(el, txt, prefix='') {
+    if (txt) { el.textContent = prefix + txt; el.style.display='block'; }
+    else { el.textContent=''; el.style.display='none'; }
+  }
+
+  if (data.a) { avatar.src = data.a; avatar.alt = data.n ? data.n : 'avatar'; }
+  else { avatar.src = ''; avatar.alt = 'avatar'; }
+
+  set(name, data.n || ''); 
+  set(uni, data.u || '');
+  set(major, data.m ? 'Major: ' + data.m : '');
+  set(level, data.g ? 'Level: ' + data.g : '');
+  set(phone, data.p ? 'Phone: ' + data.p : '');
+  set(email, data.e ? 'Email: ' + data.e : '');
+
+  li.innerHTML = '';
+  if (data.l) {
+    let href = data.l;
+    if (!/^https?:\/\//i.test(href)) {
+      href = 'https://www.linkedin.com/' + href.replace(/^\/+/, '');
     }
-  </script>
+    const a = document.createElement('a');
+    a.href = href; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = 'LinkedIn';
+    li.appendChild(a);
+  }
+
+  ints.innerHTML = '';
+  if (data.i) {
+    data.i.split(',').map(s=>s.trim()).filter(Boolean).slice(0,12).forEach(tag=>{
+      const b = document.createElement('span');
+      b.className = 'badge'; b.textContent = tag;
+      ints.appendChild(b);
+    });
+  }
+}
+
+/* wire up */
+document.getElementById('gen').addEventListener('click', showURL);
+document.getElementById('copy').addEventListener('click', copyURL);
+document.getElementById('preview').addEventListener('click', previewCard);
+['n','p','e','l','u','m','g','i','a','base'].forEach(id=>{
+  const el = document.getElementById(id);
+  el && el.addEventListener('input', ()=> { /* live update on edit after first generate */ });
+});
+
+if (location.hash) {
+  renderView();
+}
+</script>
 </body>
 </html>
+
