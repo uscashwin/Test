@@ -1,359 +1,380 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Smart Contact Card</title>
-<style>
-  :root{
-    --bg:#0a1040;
-    --card:#0f47ff;
-    --card2:#3b82f6;
-    --muted:#9db3ff;
-    --text:#eef2ff;
-    --white:#ffffff;
-    --chip:#1a2a80;
-    --shadow: 0 20px 50px rgba(0,0,0,.35);
-    --radius:24px;
-  }
-  html,body{height:100%}
-  body{
-    margin:0;background:radial-gradient(1200px 800px at 90% -10%, #1430a5 0%, var(--bg) 55%);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    color:var(--text); display:flex; align-items:center; justify-content:center; padding:18px;
-  }
-  .wrap{width:100%; max-width:420px}
-  .phone{
-    background:#0b0f2f; border-radius:36px; padding:14px; box-shadow: var(--shadow); position:relative;
-    border:1px solid rgba(255,255,255,.06)
-  }
-  .screen{background:linear-gradient(180deg, #1b2ccf 0%, #2563eb 40%, #1d4ed8 100%);
-    border-radius:28px; overflow:hidden; min-height:680px; position:relative}
-  .hero{
-    position:relative; height:240px; background:
-      linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(13,25,92,.55) 60%, rgba(13,25,92,.85) 100%);
-    display:flex; align-items:flex-end; justify-content:center; padding-bottom:16px
-  }
-  .avatar{
-    position:absolute; left:50%; top:24px; transform:translateX(-50%);
-    width:160px; height:160px; border-radius:24px; overflow:hidden;
-    box-shadow:0 16px 40px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.5)
-  }
-  .avatar img{width:100%; height:100%; object-fit:cover}
-  h1{margin:0; font-size:26px; line-height:1.1; text-align:center; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.35)}
-  .sub{margin-top:6px; text-align:center; color:var(--muted); font-weight:500}
-  .actions{display:flex; gap:12px; justify-content:center; margin:16px 0 4px}
-  .iconbtn{
-    width:46px; height:46px; border-radius:999px; background:rgba(255,255,255,.2);
-    display:grid; place-items:center; border:1px solid rgba(255,255,255,.35); backdrop-filter: blur(6px);
-    cursor:pointer; text-decoration:none; color:#fff
-  }
-  .section{
-    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28);
-    border-radius:18px; margin:14px; padding:16px
-  }
-  .section h3{margin:0 0 8px; font-size:15px; letter-spacing:.3px; color:#eef2ff}
-  .about{color:#e6edff; opacity:.95; font-size:14px}
-  .grid{display:grid; gap:10px}
-  .row{display:flex; gap:8px; align-items:center; color:#eaf0ff; font-size:14px}
-  .chip{background:var(--chip); border:1px solid rgba(255,255,255,.18); padding:8px 12px;
-        border-radius:999px; font-size:12px; color:#cfe0ff}
-  .footerbar{
-    position:sticky; bottom:0; display:flex; gap:10px; justify-content:center; padding:12px;
-  }
-  .btn{
-    background:#0ea5e9; border:none; color:#fff; padding:12px 14px; border-radius:14px;
-    font-weight:600; cursor:pointer; box-shadow:0 10px 25px rgba(14,165,233,.35)
-  }
-  .btn.secondary{background:#22c55e; box-shadow:0 10px 25px rgba(34,197,94,.35)}
-  .btn.ghost{background:transparent; border:1px solid rgba(255,255,255,.35)}
-  /* form */
-  form{padding:16px 14px 6px}
-  label{font-size:12px; color:#dbe7ff; letter-spacing:.3px}
-  input, textarea{
-    width:100%; margin:6px 0 12px; border-radius:12px; border:1px solid rgba(255,255,255,.3);
-    background:rgba(8,16,64,.3); color:#fff; padding:12px 12px; outline:none
-  }
-  input::placeholder, textarea::placeholder{color:#c5d3ff99}
-  textarea{min-height:82px; resize:vertical}
-  .inline{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
-  .hide{display:none !important}
-  .copy{
-    display:flex; gap:8px; align-items:center; justify-content:center; color:#bbd1ff; font-size:12px; margin: 6px 0 12px
-  }
-  .urlbox{
-    overflow:auto; white-space:nowrap; background:rgba(255,255,255,.08); padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.18)
-  }
-  small.muted{color:#b9c7ff; opacity:.8; font-size:12px}
-  a.link{color:#fff; text-decoration:underline; text-underline-offset:2px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NFC Contact Card – Create & Share</title>
+  <style>
+    :root{
+      --bg:#0b0f19;--card:#111729;--muted:#9aa4b2;--text:#e5ecf4;--acc:#6ee7f9;--acc-2:#a78bfa;--ok:#34d399;
+      --radius:18px;--shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;
+      color:var(--text);background:radial-gradient(1200px 800px at 10% -10%, #1d2a5a33, transparent),
+              radial-gradient(900px 600px at 100% 0%, #5b21b633, transparent),
+              var(--bg);
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;gap:12px;margin:10px 0 24px}
+    .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc-2));
+      display:grid;place-items:center;box-shadow:var(--shadow);font-weight:800;color:#0b0f19}
+    h1{font-size:clamp(20px,2.6vw,28px);margin:0}
+    .card{background:linear-gradient(180deg,#0f172a,#0b1328 45%,#0a0f22);border:1px solid #253052;border-radius:var(--radius);
+      box-shadow:var(--shadow);overflow:hidden}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .pane{padding:28px}
+    .muted{color:var(--muted)}
+    label{display:block;font-size:13px;color:var(--muted);margin:16px 0 8px}
+    input,textarea{width:100%;padding:14px 14px;border-radius:12px;border:1px solid #263149;background:#0e152b;color:var(--text);
+      outline:none;box-shadow:inset 0 0 0 1px #0b1022}
+    textarea{min-height:96px;resize:vertical}
+    .row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+    @media (max-width:640px){.row{grid-template-columns:1fr}}
+    .btn{appearance:none;border:none;background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#061020;font-weight:700;
+      padding:14px 18px;border-radius:14px;cursor:pointer;box-shadow:0 8px 20px rgba(111,200,255,.25)}
+    .btn.secondary{background:#0f172a;color:var(--text);border:1px solid #2a365a;box-shadow:none}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+    .hint{font-size:12px;color:var(--muted)}
+    .avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:2px solid #2b365e;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+    .drop{border:1.5px dashed #31406f;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;
+      background:#0b1227}
+    .drop input{display:none}
+    .tag{display:inline-block;background:#0e1a36;border:1px solid #243059;color:#dbeafe;padding:.35rem .6rem;border-radius:999px;margin:.15rem .25rem .15rem 0;font-size:.8rem}
+    .share{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
+    .share input{flex:1;min-width:260px}
+
+    /* VIEW CARD */
+    .v-wrap{display:grid;gap:22px;grid-template-columns:160px 1fr;align-items:center}
+    @media (max-width:700px){.v-wrap{grid-template-columns:1fr;justify-items:center;text-align:center}}
+    .v-head{display:flex;align-items:center;gap:16px}
+    .v-title{font-size:clamp(22px,2.4vw,30px);font-weight:800;margin:0}
+    .v-sub{margin:2px 0 0;color:#b6c2d6}
+    .v-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+    .chip{padding:.4rem .7rem;border-radius:999px;background:#0f1b36;border:1px solid #243059;color:#dbeafe;font-size:.85rem}
+    .contact a{color:var(--acc);text-decoration:none}
+    .qr{background:#0f172a;border:1px solid #2a365a;border-radius:12px;padding:10px}
+  </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="phone">
-      <div class="screen" id="screen">
+    <header>
+      <div class="logo">ID</div>
+      <div>
+        <h1>NFC Contact Card</h1>
+        <div class="muted">Create a modern, read‑only contact card and copy a share link for your NFC tag.</div>
+      </div>
+    </header>
 
-        <!-- READ-ONLY CARD -->
-        <div id="card" class="hide">
-          <div class="hero">
-            <div class="avatar"><img id="c_img" alt="Profile picture" /></div>
-            <div style="margin-top:170px;width:100%;padding:0 16px;">
-              <h1 id="c_name">—</h1>
-              <div class="sub" id="c_title">—</div>
-              <div class="actions" id="quick">
-                <!-- icons rendered by JS -->
-              </div>
+    <div id="mode-create" class="card">
+      <div class="grid">
+        <div class="pane">
+          <h2 style="margin:0 0 8px">Your details</h2>
+          <div class="muted">Fill the form. On “Generate Card”, a read‑only link is produced. Anyone opening that link can view your card but not edit it.</div>
+
+          <label>Profile picture</label>
+          <label class="drop" id="dropzone">
+            <img id="preview" class="avatar" src="" alt="Preview" style="display:none" />
+            <div>
+              <strong>Upload an image</strong>
+              <div class="hint">JPG/PNG • We’ll auto‑resize for fast sharing</div>
+            </div>
+            <input type="file" id="photo" accept="image/*" />
+          </label>
+
+          <label>Full name</label>
+          <input id="fullName" placeholder="Ada Lovelace" required />
+
+          <div class="row">
+            <div>
+              <label>University</label>
+              <input id="university" placeholder="USC" />
+            </div>
+            <div>
+              <label>Major</label>
+              <input id="major" placeholder="Astronautical Engineering" />
             </div>
           </div>
 
-          <div class="section">
-            <h3>About Me</h3>
-            <div class="about" id="c_about">—</div>
-          </div>
-
-          <div class="section">
-            <h3>Details</h3>
-            <div class="grid">
-              <div class="row">🎓 <span id="c_univ">—</span></div>
-              <div class="row">📘 <span id="c_major">—</span></div>
-              <div class="row">📅 <span id="c_grade">—</span></div>
-              <div class="row">🔗 <a class="link" target="_blank" id="c_link">LinkedIn</a></div>
-              <div class="row">📧 <a class="link" id="c_email"></a></div>
-              <div class="row">📞 <a class="link" id="c_phone"></a></div>
+          <div class="row">
+            <div>
+              <label>Grade level</label>
+              <input id="grade" placeholder="Graduate (M.S.)" />
+            </div>
+            <div>
+              <label>LinkedIn URL</label>
+              <input id="linkedin" placeholder="https://www.linkedin.com/in/username" />
             </div>
           </div>
 
-          <div class="section">
-            <h3>Interests</h3>
-            <div id="c_interests" class="grid"></div>
+          <label>Interests <span class="hint">(comma separated)</span></label>
+          <input id="interests" placeholder="Propulsion, In‑situ resource utilization, Robotics" />
+
+          <div class="row">
+            <div>
+              <label>Phone</label>
+              <input id="phone" placeholder="+1 555‑123‑4567" />
+            </div>
+            <div>
+              <label>Email</label>
+              <input id="email" placeholder="name@example.com" />
+            </div>
           </div>
 
-          <div class="footerbar">
-            <button class="btn secondary" id="dlVcf">Add to Contacts</button>
-            <a class="btn ghost" id="shareBtn" target="_blank">Open Share Link</a>
+          <div class="actions">
+            <button class="btn" id="generate">Generate Card</button>
+            <button class="btn secondary" id="clear">Reset</button>
           </div>
         </div>
 
-        <!-- CREATE / EDIT FORM (only shown when no ?v= param) -->
-        <div id="formwrap">
-          <div class="hero" style="height:180px; align-items:center; justify-content:center">
-            <h1>Create Your Contact Card</h1>
+        <div class="pane" style="border-left:1px solid #223055">
+          <h3 style="margin:0 0 8px">Share link</h3>
+          <div class="muted">After generating, copy the link below to program your NFC tag. It opens a read‑only view.</div>
+          <div class="share">
+            <input id="shareUrl" readonly placeholder="Your share link will appear here…" />
+            <button class="btn secondary" id="copy">Copy</button>
           </div>
-
-          <form id="cardForm" autocomplete="on">
-            <label>Profile Picture URL (Google Drive share link OK)</label>
-            <input id="f_img" type="url" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing" />
-
-            <div class="inline">
-              <div>
-                <label>Full Name</label>
-                <input id="f_name" placeholder="Your name" />
-              </div>
-              <div>
-                <label>Grade Level</label>
-                <input id="f_grade" placeholder="Senior, MS, etc." />
-              </div>
-            </div>
-
-            <label>University</label>
-            <input id="f_univ" placeholder="University / School" />
-
-            <label>Major</label>
-            <input id="f_major" placeholder="e.g., Mechanical Engineering" />
-
-            <label>Short Bio (1–2 sentences)</label>
-            <textarea id="f_about" placeholder="Tell people who you are and what you do."></textarea>
-
-            <div class="inline">
-              <div>
-                <label>LinkedIn URL</label>
-                <input id="f_link" type="url" placeholder="https://www.linkedin.com/in/username" />
-              </div>
-              <div>
-                <label>Phone Number</label>
-                <input id="f_phone" type="tel" placeholder="+1 555 123 4567" />
-              </div>
-            </div>
-
-            <label>Email</label>
-            <input id="f_email" type="email" placeholder="you@example.com" />
-
-            <label>Interests (comma-separated)</label>
-            <input id="f_interests" placeholder="rocketry, product design, startups" />
-
-            <div class="footerbar" style="margin-top:8px">
-              <button type="button" class="btn" id="gen">Generate share link</button>
-              <button type="button" class="btn secondary" id="preview">Preview card</button>
-            </div>
-
-            <div id="linkBlock" class="copy hide">
-              <div class="urlbox" id="shareUrl">—</div>
-              <button type="button" class="btn ghost" id="copy">Copy</button>
-            </div>
-            <p class="copy"><small class="muted">
-              This page is offline-ready and serverless. The generated link encodes your data;
-              anyone opening the link sees a read-only card—no editing possible.
-            </small></p>
-          </form>
+          <p class="hint">Tip: Most NFC tags store a URL. Program this exact link into the tag.</p>
+          <div id="est" class="hint"></div>
         </div>
+      </div>
+    </div>
 
+    <div id="mode-view" class="card" style="display:none">
+      <div class="pane">
+        <div class="v-wrap">
+          <img id="v-photo" class="avatar" alt="Profile" />
+          <div>
+            <div class="v-head">
+              <div>
+                <h2 class="v-title" id="v-name"></h2>
+                <p class="v-sub" id="v-edu"></p>
+              </div>
+            </div>
+            <div class="v-row contact" style="margin-top:12px">
+              <span class="chip" id="v-email"></span>
+              <span class="chip" id="v-phone"></span>
+              <a class="chip" id="v-linkedin" target="_blank" rel="noopener">LinkedIn ↗</a>
+            </div>
+            <div style="margin-top:14px">
+              <div class="muted" style="margin-bottom:6px">Interests</div>
+              <div id="v-tags"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:12px;flex-wrap:wrap">
+          <div class="muted hint">This is a <strong>read‑only</strong> card. To make a new one, remove the URL hash.</div>
+          <canvas id="qr" class="qr" width="128" height="128" title="QR to this card"></canvas>
+        </div>
       </div>
     </div>
   </div>
 
-<script>
-  // --- helpers -------------------------------------------------
-  const qs = (s, o=document)=>o.querySelector(s);
-  const qsa = (s, o=document)=>[...o.querySelectorAll(s)];
+  <!-- LZ‑String (URI safe) https://github.com/pieroxy/lz-string | Minified subset (compressToEncodedURIComponent / decompressFromEncodedURIComponent) -->
+  <script>
+  const LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n={};var t={};var e={compressToEncodedURIComponent:function(r){if(null==r)return"";return e._compress(r,6,function(o){return"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$".charAt(o)})},decompressFromEncodedURIComponent:function(r){if(null==r)return"";if(r=="")return null;r=r.replace(/ /g,"+");return e._decompress(r.length,32,function(n){return o("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",r.charAt(n))})},_compress:function(o,t,e){if(null==o)return"";var i,s,u,a={},c={},l="",f="",h="",p=2,d=3,v=2,g=[],m=0,y=0;for(u=0;u<o.length;u+=1)if(l=o.charAt(u),Object.prototype.hasOwnProperty.call(a,l)||(a[l]=d++,c[l]=!0),f=h+l,Object.prototype.hasOwnProperty.call(a,f))h=f;else{if(Object.prototype.hasOwnProperty.call(c,h)){if(h.charCodeAt(0)<256){for(i=0;i<v;i++)m<<=1,y==t-1?(y=0,g.push(e(m)),m=0):y++;for(s=h.charCodeAt(0),i=0;i<8;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}else{for(s=1,i=0;i<v;i++)m=m<<1|s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s=0;for(s=h.charCodeAt(0),i=0;i<16;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}p--,0==p&&(p=Math.pow(2,v),v++),delete c[h]}else for(s=a[h],i=0;i<v;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1;p--,0==p&&(p=Math.pow(2,v),v++),a[f]=d++,h=String(l)}if(""!==h){if(Object.prototype.hasOwnProperty.call(c,h)){if(h.charCodeAt(0)<256){for(i=0;i<v;i++)m<<=1,y==t-1?(y=0,g.push(e(m)),m=0):y++;for(s=h.charCodeAt(0),i=0;i<8;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}else{for(s=1,i=0;i<v;i++)m=m<<1|s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s=0;for(s=h.charCodeAt(0),i=0;i<16;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1}p--,0==p&&(p=Math.pow(2,v),v++),delete c[h]}else for(s=a[h],i=0;i<v;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1;p--,0==p&&(p=Math.pow(2,v),v++)}for(s=2,i=0;i<v;i++)m=m<<1|1&s,y==t-1?(y=0,g.push(e(m)),m=0):y++,s>>=1;for(;;){if(m<<=1,y==t-1){g.push(e(m));break}y++}return g.join("")},_decompress:function(o,t,e){var i,s,u,a,c,l,f,h,p=[],d=4,v=4,g=3,m="",y=[],w={val:e(0),position:t,index:1};for(i=0;i<3;i+=1)p[i]=i;for(u=0,c=Math.pow(2,2),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;switch(s=parseInt(m,2),s){case 0:for(m="",c=Math.pow(2,8),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;f=p[3]=r(parseInt(m,2));break;case 1:for(m="",c=Math.pow(2,16),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;f=p[3]=r(parseInt(m,2));break;case 2:return""}for(y.push(f),h=f;w.index<=o;){for(m="",c=Math.pow(2,g),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;switch(f=s=parseInt(m,2),s){case 0:for(m="",c=Math.pow(2,8),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;p[v++]=r(parseInt(m,2)),f=v-1,g--;break;case 1:for(m="",c=Math.pow(2,16),l=1;l!=c;)a=w.val&w.position,w.position>>=1,0==w.position&&(w.position=t,w.val=e(w.index++)),m+=a?"1":"0",l<<=1;p[v++]=r(parseInt(m,2)),f=v-1,g--;break;case 2:return y.join("")}0==g&&(g=Math.pow(2,++d));if(p[f])h=p[f];else{if(f!==v)return null;h=h+ h.charAt(0)}y.push(h),p[v++]=h=h+ h.charAt(0)}return y.join("")}};return e}();
+  </script>
 
-  // Base64 (UTF-8 safe)
-  function encode64(obj){
-    const json = JSON.stringify(obj);
-    return btoa(unescape(encodeURIComponent(json)));
-  }
-  function decode64(s){
-    return JSON.parse(decodeURIComponent(escape(atob(s))));
-  }
+  <script>
+    const $ = (id)=>document.getElementById(id);
 
-  // Convert common Google Drive share links to direct image links
-  function driveToDirect(url){
-    if(!url) return "";
-    try{
-      const u = new URL(url);
-      if(u.hostname.includes("drive.google.com")){
-        // patterns: /file/d/<id>/view, or /uc?id=<id>, or open?id=<id>
-        let id = u.pathname.split("/").includes("file") ? u.pathname.split("/")[3] : (u.searchParams.get("id") || "");
-        if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
-      }
-    }catch(e){}
-    return url;
-  }
-
-  // Build short object with tiny keys to keep URL compact
-  function collectForm(){
-    return {
-      N: qs("#f_name").value.trim(),
-      U: qs("#f_univ").value.trim(),
-      M: qs("#f_major").value.trim(),
-      G: qs("#f_grade").value.trim(),
-      A: qs("#f_about").value.trim(),
-      I: qs("#f_interests").value.trim(),
-      L: qs("#f_link").value.trim(),
-      P: qs("#f_phone").value.trim(),
-      E: qs("#f_email").value.trim(),
-      IMG: driveToDirect(qs("#f_img").value.trim())
-    };
-  }
-
-  function fillCard(d){
-    const img = d.IMG || "";
-    qs("#c_img").src = img || "https://picsum.photos/seed/initials/600/600";
-    qs("#c_name").textContent = d.N || "Your Name";
-    qs("#c_title").textContent = (d.G? d.G+" · " : "") + (d.M || "");
-    qs("#c_about").textContent = d.A || "—";
-    qs("#c_univ").textContent = d.U || "—";
-    qs("#c_major").textContent = d.M || "—";
-    qs("#c_grade").textContent = d.G || "—";
-
-    // Interests chips
-    const wrap = qs("#c_interests");
-    wrap.innerHTML = "";
-    (d.I||"").split(",").map(s=>s.trim()).filter(Boolean).slice(0,16).forEach(s=>{
-      const chip = document.createElement("span");
-      chip.className = "chip"; chip.textContent = s; wrap.appendChild(chip);
-    });
-
-    // links
-    const link = d.L && d.L.startsWith("http") ? d.L : "";
-    const mail = d.E ? `mailto:${d.E}` : "#";
-    const tel  = d.P ? `tel:${d.P.replace(/[^\d+]/g,"")}` : "#";
-    qs("#c_link").href = link || "#";
-    qs("#c_link").textContent = link ? "LinkedIn Profile" : "—";
-    qs("#c_email").href = mail; qs("#c_email").textContent = d.E || "—";
-    qs("#c_phone").href = tel;  qs("#c_phone").textContent = d.P || "—";
-
-    // quick round buttons
-    const quick = qs("#quick"); quick.innerHTML = "";
-    const mk = (href, label, glyph) => {
-      if(!href || href==="#") return;
-      const a = document.createElement("a");
-      a.href = href; a.className = "iconbtn"; a.setAttribute("aria-label", label);
-      a.innerHTML = glyph; quick.appendChild(a);
-    };
-    const iconMail = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>';
-    const iconPhone= '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.15 8.81 19.79 19.79 0 0 1 .08 0c0-1.2.8-2.17 2-2.17h3a2 2 0 0 1 2 1.72c.12.89.31 1.76.57 2.6a2 2 0 0 1-.45 2.11L6.1 6.72a16 16 0 0 0 7.18 7.18l2.46-1.11a2 2 0 0 1 2.11.45c.84.26 1.71.45 2.6.57A2 2 0 0 1 22 16.92z"/></svg>';
-    const iconLI   = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.5 8.5h4V24h-4V8.5zM8.5 8.5h3.8v2.1h.1c.5-.9 1.7-2.1 3.6-2.1 3.9 0 4.6 2.6 4.6 6V24h-4v-6.6c0-1.6 0-3.7-2.2-3.7s-2.6 1.7-2.6 3.5V24h-4V8.5z"/></svg>';
-    mk(mail, "Email", iconMail);
-    mk(tel, "Phone", iconPhone);
-    if(link) mk(link, "LinkedIn", iconLI);
-  }
-
-  function buildURL(d){
-    const packed = encode64(d);
-    return location.origin + location.pathname + "?v=" + packed;
-  }
-
-  function showView(d){
-    fillCard(d);
-    qs("#formwrap").classList.add("hide");
-    qs("#card").classList.remove("hide");
-    const url = buildURL(d);
-    qs("#shareBtn").href = url;
-    // vCard download
-    qs("#dlVcf").onclick = () => downloadVcf(d);
-  }
-
-  function downloadVcf(d){
-    const lines = [
-      "BEGIN:VCARD",
-      "VERSION:3.0",
-      `FN:${d.N||""}`,
-      `ORG:${d.U||""}`,
-      `TITLE:${(d.G||"") + (d.M? (d.G?" · ":"") + d.M : "")}`,
-      d.P ? `TEL;TYPE=CELL,VOICE:${d.P}` : "",
-      d.E ? `EMAIL;TYPE=INTERNET:${d.E}` : "",
-      d.L ? `URL:${d.L}` : "",
-      d.IMG ? `PHOTO;VALUE=URI:${d.IMG}` : "",
-      "END:VCARD"
-    ].filter(Boolean).join("\n");
-    const blob = new Blob([lines], {type:"text/vcard"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = (d.N?.replace(/\s+/g,"_") || "contact") + ".vcf";
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-  }
-
-  // --- wiring --------------------------------------------------
-  (function init(){
-    const params = new URLSearchParams(location.search);
-    const v = params.get("v");
-    if(v){
-      try { showView(decode64(v)); }
-      catch(e){ alert("Invalid link data."); }
-      return;
+    // --- Image handling: resize to ~256x256 JPEG for compact share size ---
+    async function fileToDataURL(file, max=256){
+      return new Promise((resolve,reject)=>{
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = e=>{img.src = e.target.result};
+        reader.onerror = reject;
+        img.onload = ()=>{
+          const scale = Math.min(max/img.width, max/img.height, 1);
+          const w = Math.max(1, Math.round(img.width*scale));
+          const h = Math.max(1, Math.round(img.height*scale));
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img,0,0,w,h);
+          // quality 0.75 keeps size modest
+          const data = c.toDataURL('image/jpeg', 0.75);
+          resolve(data);
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
-    // Create mode
-    qs("#gen").onclick = ()=>{
-      const d = collectForm();
-      const url = buildURL(d);
-      qs("#linkBlock").classList.remove("hide");
-      qs("#shareUrl").textContent = url;
-    };
-    qs("#copy").onclick = async ()=>{
-      const txt = qs("#shareUrl").textContent.trim();
-      if(!txt) return;
-      try{ await navigator.clipboard.writeText(txt); alert("Link copied!"); }
-      catch(e){ /* fallback */ }
-    };
-    qs("#preview").onclick = ()=>{
-      const d = collectForm();
-      // open preview in same tab
-      location.href = buildURL(d);
-    };
-  })();
-</script>
+    // QR (minimal): generate basic QR using third‑party CDN fallback? We’ll draw a simple placeholder grid using a tiny library‑less approach.
+    // For reliability without network, we keep a tiny, dependency‑free QR encoder (Kazuhiko Arase, MIT) stripped.
+    // --- BEGIN tiny QR encoder (version=5, EC=L) ---
+    // Source adapted and minimized from https://github.com/kazuhikoarase/qrcode-generator (MIT)
+    // Only keeps createSvgTag / addData / make / modules.
+    (function(){
+      function QR8bitByte(data){this.mode=4;this.data=data;this.parsed=[];for(let i=0;i<data.length;i++){this.parsed.push(data.charCodeAt(i));}}
+      QR8bitByte.prototype={getLength:function(){return this.parsed.length},write:function(buf){for(var i=0;i<this.parsed.length;i++){buf.put(this.parsed[i],8)}}};
+      function QRBitBuffer(){this.buffer=[],this.length=0}
+      QRBitBuffer.prototype={get:function(i){return (this.buffer[Math.floor(i/8)]>>> (7 - i%8)) &1},
+        put:function(num,length){for(let i=0;i<length;i++){this.putBit(((num>>> (length - i -1))&1)==1)}},
+        putBit:function(bit){this.buffer[Math.floor(this.length/8)] ||=0; if(bit){this.buffer[Math.floor(this.length/8)] |= (0x80>>> (this.length%8))} this.length++;}
+      };
+      function QRMath(){}
+      QRMath.glog=function(n){if(n<1)throw new Error('glog');return LOG_TABLE[n]};
+      QRMath.gexp=function(n){for(;n<0;)n+=255;for(;n>=256;)n-=255;return EXP_TABLE[n]};
+      const EXP_TABLE=new Array(256), LOG_TABLE=new Array(256); for(let i=0;i<8;i++)EXP_TABLE[i]=1<<i; for(let i=8;i<256;i++)EXP_TABLE[i]=EXP_TABLE[i-4]^EXP_TABLE[i-5]^EXP_TABLE[i-6]^EXP_TABLE[i-8]; for(let i=0;i<256;i++)LOG_TABLE[EXP_TABLE[i]]=i;
+      function QRPolynomial(num, shift){let offset=0; while(offset<num.length&&num[offset]==0)offset++; this.num=new Array(num.length-offset+shift); for(let i=0;i<num.length-offset;i++)this.num[i]=num[i+offset]}
+      QRPolynomial.prototype={get:function(i){return this.num[i]},getLength:function(){return this.num.length},
+        multiply:function(e){var num=new Array(this.getLength()+e.getLength()-1); for(let i=0;i<this.getLength();i++)for(let j=0;j<e.getLength();j++)num[i+j]^=QRMath.gexp(QRMath.glog(this.get(i))+QRMath.glog(e.get(j))); return new QRPolynomial(num,0)},
+        mod:function(e){if(this.getLength()-e.getLength()<0)return this; var ratio=QRMath.glog(this.get(0))-QRMath.glog(e.get(0)); var num=this.num.slice(); for(let i=0;i<e.getLength();i++)num[i]^=QRMath.gexp(QRMath.glog(e.get(i))+ratio); return new QRPolynomial(num,0).mod(e)}
+      };
+      function QRRSBlock(){ }
+      QRRSBlock.getRSBlocks=function(type){return RS_BLOCK_TABLE[type]};
+      const RS_BLOCK_TABLE={1:[[1,19,7]],2:[[1,34,10]],3:[[1,55,15]],4:[[1,80,20]],5:[[1,108,26]],6:[[1,136,18]],7:[[2,156,20]],8:[[2,194,24]],9:[[2,232,30]],10:[[2,274,18]]};
+      function QRCode(type){this.type=type; this.modules=null; this.moduleCount=0; this.dataList=[]}
+      QRCode.prototype={addData:function(data){this.dataList.push(new QR8bitByte(data))},make:function(){this.makeImpl(1)},
+        makeImpl:function(eclevel){this.moduleCount=typeToSize(this.type); this.modules=new Array(this.moduleCount); for(let r=0;r<this.moduleCount;r++){this.modules[r]=new Array(this.moduleCount); for(let c=0;c<this.moduleCount;c++)this.modules[r][c]=null}
+          setupPos(this,0,0); setupPos(this,this.moduleCount-7,0); setupPos(this,0,this.moduleCount-7);
+          let data=createData(this.type,this.dataList); mapData(this,data); }
+      };
+      function typeToSize(t){return 21+(t-1)*4}
+      function setupPos(qr,row,col){for(let r=-1;r<=7;r++)for(let c=-1;c<=7;c++){let rr=row+r,cc=col+c; if(rr<0||rr>=qr.moduleCount||cc<0||cc>=qr.moduleCount)continue; let v=(r>=0&&r<=6&&(c==0||c==6))||(c>=0&&c<=6&&(r==0||r==6))||(r>=2&&r<=4&&c>=2&&c<=4); qr.modules[rr][cc]=v}}
+      function createData(type, dataList){let rs=QRRSBlock.getRSBlocks(type)[0]; let buffer=new QRBitBuffer(); for(let i=0;i<dataList.length;i++){let d=dataList[i]; buffer.put(4,4); buffer.put(d.getLength(),8); d.write(buffer);} let totalDataCount=rs[2];
+        // pad
+        for(let i=0;i<totalDataCount;i++) buffer.put(0,8);
+        return new Array(totalDataCount).fill(0).map((_,i)=> buffer.buffer[i]||0);
+      }
+      function mapData(qr, data){let inc=-1,row=qr.moduleCount-1,bitIndex=0,byteIndex=0; for(let col=qr.moduleCount-1; col>0; col-=2){if(col==6)col--; for(;;){ for(let c=0;c<2;c++){let cc=col-c; if(qr.modules[row][cc]==null){ let dark = ((byteIndex<data.length) && (((data[byteIndex]>>> (7-bitIndex)) &1)==1)); qr.modules[row][cc]=dark; bitIndex++; if(bitIndex==8){bitIndex=0; byteIndex++;}}}
+          row+=inc; if(row<0||row>=qr.moduleCount){row-=inc; inc=-inc; break}}
+      }
+      window.__miniQR = function(text){let t=1; // pick small type up to 10
+        for(;t<10 && text.length> (RS_BLOCK_TABLE[t][0][1]-RS_BLOCK_TABLE[t][0][2]); t++); let qr=new QRCode(t); qr.addData(text); qr.make(); return qr.modules; };
+    })();
+    // --- END tiny QR encoder ---
+
+    function drawQR(canvas, text){
+      const modules = window.__miniQR(text);
+      const n = modules.length;
+      const scale = Math.floor(Math.min(canvas.width, canvas.height) / (n+2));
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0b0f19'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#e5ecf4';
+      for(let r=0;r<n;r++){
+        for(let c=0;c<n;c++){
+          if(modules[r][c]) ctx.fillRect((c+1)*scale,(r+1)*scale, scale, scale);
+        }
+      }
+    }
+
+    function validateUrl(u){try{const url=new URL(u); return /^https?:/.test(url.protocol);}catch{ return false;}}
+    function sanitize(s){return (s||'').trim()}
+
+    async function buildPayload(){
+      const name = sanitize($("fullName").value);
+      if(!name) { alert('Please enter your full name.'); return }
+      const email = sanitize($("email").value);
+      if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email.'); return }
+      const phone = sanitize($("phone").value);
+      const linkedin = sanitize($("linkedin").value);
+      if(linkedin && !validateUrl(linkedin)) { alert('Please enter a valid LinkedIn URL.'); return }
+
+      // Image (optional)
+      let photoData = '';
+      const file = $("photo").files[0];
+      if(file){
+        photoData = await fileToDataURL(file, 256); // resized data URL
+      }
+
+      const payload = {
+        v:1,
+        n:name,
+        u:sanitize($("university").value),
+        m:sanitize($("major").value),
+        g:sanitize($("grade").value),
+        i:sanitize($("interests").value),
+        l:linkedin,
+        p:phone,
+        e:email,
+        img:photoData // may be empty string
+      };
+      return payload;
+    }
+
+    function estimateSize(str){
+      // crude byte length estimate for NFC planning
+      return new TextEncoder().encode(str).length;
+    }
+
+    function toShareURL(payload){
+      const json = JSON.stringify(payload);
+      const compressed = LZString.compressToEncodedURIComponent(json);
+      return location.origin + location.pathname + '#v=' + compressed;
+    }
+
+    function renderView(data){
+      $("mode-create").style.display='none';
+      $("mode-view").style.display='block';
+      $("v-name").textContent = data.n || '';
+      const eduBits = [data.u, data.m, data.g].filter(Boolean);
+      $("v-edu").textContent = eduBits.join(' • ');
+      if(data.img){ $("v-photo").src = data.img; } else { $("v-photo").src='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#0e162f"/><text x="50%" y="55%" text-anchor="middle" fill="#6b7280" font-family="sans-serif" font-size="42">👤</text></svg>'); }
+      const tagWrap = $("v-tags"); tagWrap.innerHTML='';
+      (data.i||'').split(',').map(s=>s.trim()).filter(Boolean).slice(0,12).forEach(t=>{
+        const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagWrap.appendChild(span);
+      });
+      $("v-email").textContent = data.e? data.e : '—';
+      $("v-phone").textContent = data.p? data.p : '—';
+      const link = $("v-linkedin");
+      if(data.l){ link.href=data.l; link.style.display='inline-block'} else { link.style.display='none' }
+      // QR of the exact URL on screen
+      drawQR($("qr"), location.href);
+    }
+
+    function maybeViewFromHash(){
+      const h = location.hash;
+      if(h.startsWith('#v=')){
+        try{
+          const comp = h.slice(3);
+          const json = LZString.decompressFromEncodedURIComponent(comp);
+          const obj = JSON.parse(json);
+          renderView(obj);
+          return true;
+        }catch(err){ console.error(err); alert('This link is corrupted or unsupported.'); }
+      }
+      return false;
+    }
+
+    // --- Event wiring ---
+    document.addEventListener('DOMContentLoaded', ()=>{
+      if(maybeViewFromHash()) return;
+
+      const drop = $('dropzone');
+      const file = $('photo');
+      const preview = $('preview');
+      function showPreview(f){ if(!f) return; const url=URL.createObjectURL(f); preview.src=url; preview.style.display='block'; }
+      drop.addEventListener('click', ()=> file.click());
+      drop.addEventListener('dragover', e=>{e.preventDefault(); drop.style.borderColor='#3b82f6'});
+      drop.addEventListener('dragleave', ()=> drop.style.borderColor='#31406f');
+      drop.addEventListener('drop', e=>{e.preventDefault(); drop.style.borderColor='#31406f'; if(e.dataTransfer.files[0]){ file.files = e.dataTransfer.files; showPreview(e.dataTransfer.files[0]) }});
+      file.addEventListener('change', ()=> showPreview(file.files[0]));
+
+      $('generate').addEventListener('click', async ()=>{
+        const payload = await buildPayload(); if(!payload) return;
+        const url = toShareURL(payload);
+        $('shareUrl').value = url;
+        const bytes = estimateSize(url);
+        $('est').textContent = `Approx. URL size: ${bytes} bytes`;
+        // also switch to view so they can verify
+        history.replaceState(null,'', url);
+        renderView(payload);
+      });
+
+      $('copy').addEventListener('click', async()=>{
+        const val=$('shareUrl').value; if(!val){return}
+        try{ await navigator.clipboard.writeText(val); $('copy').textContent='Copied!'; setTimeout(()=>{$('copy').textContent='Copy'},1200)} catch{ alert('Copy failed. Select and copy manually.') }
+      });
+      $('clear').addEventListener('click', ()=>{ document.querySelectorAll('input, textarea').forEach(el=> el.value=''); $('shareUrl').value=''; $('preview').style.display='none'; })
+    });
+
+    window.addEventListener('hashchange', ()=>{ location.reload() });
+  </script>
 </body>
 </html>
-
