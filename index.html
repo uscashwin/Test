@@ -1,552 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Shareable Profile Card</title>
-<style>
-  :root{
-    --bg: #0b0f14;
-    --card: #0f1620;
-    --muted: #94a3b8;
-    --text: #e5eef9;
-    --accent: #4f46e5;
-    --accent2: #22d3ee;
-    --ok: #10b981;
-    --warn:#f59e0b;
-    --err:#ef4444;
-    --ring: rgba(79,70,229,.4);
-    --radius: 16px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    color:var(--text);
-    background:
-      radial-gradient(1200px 600px at 10% -10%, rgba(79,70,229,.35), transparent 60%),
-      radial-gradient(1000px 500px at 110% 10%, rgba(34,211,238,.25), transparent 60%),
-      linear-gradient(180deg, #0b0f14, #0b0f14);
-  }
-  .wrap{max-width:980px;margin:0 auto;padding:24px}
-  header{
-    display:flex;justify-content:space-between;align-items:center;
-    margin:8px 0 20px 0;
-  }
-  .brand{font-weight:700;letter-spacing:.4px}
-  .brand .b1{font-size:22px}
-  .brand .b2{font-size:12px;color:var(--muted)}
-  .card{
-    background:rgba(15,22,32,.7);
-    border:1px solid rgba(148,163,184,.15);
-    border-radius:var(--radius);
-    box-shadow: 0 8px 30px rgba(2,8,23,.55), inset 0 1px 0 rgba(255,255,255,.03);
-    backdrop-filter: blur(6px);
-  }
-  .grid{display:grid; gap:20px}
-  @media(min-width:820px){ .grid{ grid-template-columns: 1.1fr 1fr; } }
-  .section{padding:20px}
-  .section h2{margin:0 0 12px 0; font-size:18px; letter-spacing:.3px}
-  .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-  label{font-size:13px; color:var(--muted)}
-  input[type="text"],
-  input[type="url"],
-  input[type="email"],
-  input[type="tel"],
-  select,
-  textarea{
-    background:#0b111a; color:var(--text);
-    border:1px solid rgba(148,163,184,.25);
-    border-radius:12px; padding:12px 14px; outline:none;
-    transition:border .15s, box-shadow .15s, transform .02s;
-  }
-  input:focus, select:focus, textarea:focus{
-    border-color: var(--accent);
-    box-shadow: 0 0 0 6px var(--ring);
-  }
-  .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
-  .hint{font-size:12px;color:var(--muted)}
-  .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
-  .btn{
-    appearance:none; border:1px solid transparent; cursor:pointer;
-    background:linear-gradient(135deg, var(--accent), var(--accent2));
-    color:white; padding:12px 16px; border-radius:12px; font-weight:600;
-    box-shadow: 0 8px 22px rgba(79,70,229,.35);
-    transition: transform .06s ease, box-shadow .15s ease, filter .15s ease;
-  }
-  .btn.secondary{ background:#0b111a; border-color:rgba(148,163,184,.25); color:var(--text); box-shadow:none }
-  .btn.ghost{ background:transparent; border-color:rgba(148,163,184,.25); color:var(--text) }
-  .btn:active{ transform: translateY(1px) }
-  .divider{height:1px; background:linear-gradient(90deg, transparent, rgba(148,163,184,.25), transparent)}
-  .preview{
-    display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;
-  }
-  .avatar{
-    width:144px; height:144px; border-radius:50%;
-    border:2px solid rgba(255,255,255,.08);
-    object-fit:cover; background:#0b111a;
-    box-shadow: 0 8px 26px rgba(2,8,23,.65), inset 0 0 0 1px rgba(255,255,255,.05);
-  }
-  .name{font-size:20px; font-weight:700}
-  .meta{font-size:14px; color:var(--muted); line-height:1.35}
-  .list{width:100%; display:grid; gap:10px}
-  .item{
-    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
-    background:#0b111a; border:1px solid rgba(148,163,184,.18);
-  }
-  .item a{ color:#c7d2fe; text-decoration:none; word-break: break-all }
-  .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono",monospace; font-size:13px; color:#cbd5e1}
-  .badge{
-    display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#cbd5e1;
-    background:#0b111a; border:1px dashed rgba(148,163,184,.35); padding:8px 10px; border-radius:999px;
-  }
-  footer{color:var(--muted); font-size:12px; text-align:center; margin:20px 0 10px}
-  .hidden{display:none !important}
-  .error{color:var(--err); font-size:12px; margin-top:-6px}
-  .success{color:var(--ok); font-size:12px}
-  .upload{
-    border:1.5px dashed rgba(148,163,184,.35); border-radius:12px; padding:14px;
-    background:#0b111a; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-  }
-  .upload input{display:none}
-  .upload .info{display:flex; flex-direction:column; gap:6px}
-  .chip{font-size:12px; color:var(--muted)}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Contact Card</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form, .profile-card {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    input[type="file"] {
+      padding: 6px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #0073b1;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005b91;
+    }
+
+    .profile-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+
+    .profile-info {
+      text-align: center;
+    }
+
+    .profile-info p {
+      margin: 6px 0;
+      color: #333;
+    }
+
+    a {
+      color: #0073b1;
+      word-break: break-all;
+    }
+
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="b1">Profile Card Generator</div>
-        <div class="b2">Create a read-only contact card link for networking</div>
-      </div>
-      <span id="modeBadge" class="badge"><span>Mode:</span><strong id="modeText">Edit</strong></span>
-    </header>
 
-    <div id="editView" class="card section">
-      <h2>Your Details</h2>
-      <div class="grid">
-        <div>
-          <div class="field">
-            <label for="fullName">Full Name *</label>
-            <input id="fullName" type="text" placeholder="e.g., Ashwin Rajkumar" required />
-            <div class="error" id="errName"></div>
-          </div>
+<div class="container">
+  <h2 id="title">Create Your Contact Card</h2>
 
-          <div class="row">
-            <div class="field">
-              <label for="university">University *</label>
-              <input id="university" type="text" placeholder="e.g., University of Southern California" required />
-              <div class="error" id="errUniversity"></div>
-            </div>
-            <div class="field">
-              <label for="grade">Grade Level *</label>
-              <select id="grade" required>
-                <option value="">Select…</option>
-                <option>Freshman</option>
-                <option>Sophomore</option>
-                <option>Junior</option>
-                <option>Senior</option>
-                <option>Master’s</option>
-                <option>PhD</option>
-                <option>Alumni</option>
-                <option>Other</option>
-              </select>
-              <div class="error" id="errGrade"></div>
-            </div>
-          </div>
+  <form id="profileForm">
+    <input type="file" id="profilePic" accept="image/*" required />
+    <input type="text" id="fullName" placeholder="Full Name" required />
+    <input type="text" id="university" placeholder="University" required />
+    <input type="text" id="major" placeholder="Major" required />
+    <input type="text" id="gradeLevel" placeholder="Grade Level" required />
+    <input type="text" id="interests" placeholder="Interests (comma separated)" required />
+    <input type="url" id="linkedin" placeholder="LinkedIn URL" required />
+    <input type="tel" id="phone" placeholder="Phone Number" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <button type="submit">Save and View</button>
+  </form>
 
-          <div class="row">
-            <div class="field">
-              <label for="major">Major *</label>
-              <input id="major" type="text" placeholder="e.g., Astronautical Engineering" required />
-              <div class="error" id="errMajor"></div>
-            </div>
-            <div class="field">
-              <label for="interests">Interests (comma-separated)</label>
-              <input id="interests" type="text" placeholder="e.g., Propulsion, LLM Agents, Lunar Habitats" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label for="email">Email *</label>
-              <input id="email" type="email" placeholder="you@example.com" required />
-              <div class="error" id="errEmail"></div>
-            </div>
-            <div class="field">
-              <label for="phone">Phone *</label>
-              <input id="phone" type="tel" placeholder="+1 555 123 4567" required />
-              <div class="error" id="errPhone"></div>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="linkedin">LinkedIn URL *</label>
-            <input id="linkedin" type="url" placeholder="https://www.linkedin.com/in/your-handle" required />
-            <div class="error" id="errLinkedIn"></div>
-          </div>
-
-          <div class="field">
-            <label>Profile Photo (JPG/PNG, will be resized)</label>
-            <div class="upload">
-              <div class="info">
-                <div class="chip">Tip: Use a square image for best results.</div>
-                <div class="hint">Max link friendliness: we auto-resize to ~256×256 JPEG.</div>
-              </div>
-              <div>
-                <label class="btn ghost" for="photoInput">Choose Image</label>
-                <input id="photoInput" type="file" accept="image/*" />
-              </div>
-            </div>
-            <div class="hint" id="photoName"></div>
-          </div>
-
-          <div class="actions">
-            <button id="generateBtn" class="btn">Generate Share Link</button>
-            <button id="clearBtn" class="btn secondary" type="button">Clear</button>
-          </div>
-          <div class="hint" style="margin-top:8px">
-            After generating, copy the link and embed it in a QR code. Opening the link shows a read-only card.
-          </div>
-        </div>
-
-        <div>
-          <div class="divider"></div>
-          <div class="section preview">
-            <img id="previewAvatar" class="avatar" alt="Profile Preview" />
-            <div class="name" id="previewName">Your Name</div>
-            <div class="meta" id="previewMeta">University • Major • Grade</div>
-            <div class="list">
-              <div class="item"><span>💼</span><a id="previewLinkedIn" href="#" target="_blank" rel="noopener">LinkedIn</a></div>
-              <div class="item"><span>✉️</span><a id="previewEmail" href="#">you@example.com</a></div>
-              <div class="item"><span>📞</span><span id="previewPhone" class="mono">+1 555 123 4567</span></div>
-              <div class="item"><span>⭐</span><span id="previewInterests">Your interests appear here</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div id="profileCard" class="profile-card" style="display: none;">
+    <img id="cardPhoto" src="" alt="Profile Photo"/>
+    <div class="profile-info">
+      <p><strong id="cardName"></strong></p>
+      <p id="cardUniversity"></p>
+      <p id="cardMajor"></p>
+      <p id="cardGradeLevel"></p>
+      <p id="cardInterests"></p>
+      <p><a id="cardLinkedIn" href="" target="_blank">LinkedIn</a></p>
+      <p id="cardPhone"></p>
+      <p><a id="cardEmail" href=""></a></p>
     </div>
-
-    <!-- View-only card -->
-    <div id="readView" class="card section hidden" aria-live="polite">
-      <div class="grid" style="grid-template-columns: 1fr;">
-        <div class="preview">
-          <img id="cardAvatar" class="avatar" alt="Profile Photo" />
-          <div class="name" id="cardName"></div>
-          <div class="meta" id="cardMeta"></div>
-          <div class="list" style="max-width:680px">
-            <div class="item"><span>💼</span><a id="cardLinkedIn" href="#" target="_blank" rel="noopener">LinkedIn</a></div>
-            <div class="item"><span>✉️</span><a id="cardEmail" href="#">Email</a></div>
-            <div class="item"><span>📞</span><span id="cardPhone" class="mono"></span></div>
-            <div class="item"><span>⭐</span><span id="cardInterests"></span></div>
-          </div>
-          <div class="actions">
-            <button id="copyLinkBtn" class="btn secondary" type="button">Copy Link</button>
-            <button id="downloadVcfBtn" class="btn" type="button">Download vCard (.vcf)</button>
-          </div>
-          <div id="copyStatus" class="hint"></div>
-        </div>
-      </div>
-    </div>
-
-    <footer>© <span id="year"></span> Shareable Profile Card • Modern UI</footer>
   </div>
+</div>
 
 <script>
-(function(){
-  const $ = sel => document.querySelector(sel);
+  const form = document.getElementById('profileForm');
+  const card = document.getElementById('profileCard');
+  const title = document.getElementById('title');
 
-  // Elements (Edit mode)
-  const editView = $('#editView');
-  const readView = $('#readView');
-  const modeText = $('#modeText');
-  const photoInput = $('#photoInput');
-  const photoName = $('#photoName');
-  const fullName = $('#fullName');
-  const university = $('#university');
-  const major = $('#major');
-  const grade = $('#grade');
-  const interests = $('#interests');
-  const email = $('#email');
-  const phone = $('#phone');
-  const linkedin = $('#linkedin');
-  const generateBtn = $('#generateBtn');
-  const clearBtn = $('#clearBtn');
-
-  // Preview (Edit)
-  const previewAvatar = $('#previewAvatar');
-  const previewName = $('#previewName');
-  const previewMeta = $('#previewMeta');
-  const previewLinkedIn = $('#previewLinkedIn');
-  const previewEmail = $('#previewEmail');
-  const previewPhone = $('#previewPhone');
-  const previewInterests = $('#previewInterests');
-
-  // Read-only card
-  const cardAvatar = $('#cardAvatar');
-  const cardName = $('#cardName');
-  const cardMeta = $('#cardMeta');
-  const cardLinkedIn = $('#cardLinkedIn');
-  const cardEmail = $('#cardEmail');
-  const cardPhone = $('#cardPhone');
-  const cardInterests = $('#cardInterests');
-  const copyLinkBtn = $('#copyLinkBtn');
-  const copyStatus = $('#copyStatus');
-  const downloadVcfBtn = $('#downloadVcfBtn');
-
-  // Error fields
-  const err = {
-    name: $('#errName'),
-    university: $('#errUniversity'),
-    grade: $('#errGrade'),
-    major: $('#errMajor'),
-    email: $('#errEmail'),
-    phone: $('#errPhone'),
-    linkedin: $('#errLinkedIn'),
-  };
-
-  // Defaults for preview
-  let imageDataURL = '';
-
-  previewAvatar.src = '';
-  $('#year').textContent = new Date().getFullYear();
-
-  // Utility: sanitize text (basic)
-  const sanitize = s => (s || '').toString().trim();
-
-  // Utility: base64url encode/decode
-  function b64urlEncode(str){
-    return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-  }
-  function b64urlDecode(str){
-    str = str.replace(/-/g,'+').replace(/_/g,'/');
-    while (str.length % 4) str += '=';
-    return atob(str);
+  function saveToLocalStorage(data) {
+    localStorage.setItem('contactCardData', JSON.stringify(data));
   }
 
-  // Utility: resize image to square canvas, return JPEG data URL
-  function resizeImageToDataURL(file, maxSize=256, quality=0.75){
-    return new Promise((resolve,reject)=>{
-      const reader = new FileReader();
-      reader.onload = e=>{
-        const img = new Image();
-        img.onload = ()=>{
-          const side = Math.min(maxSize, Math.max(img.width, img.height));
-          const canvas = document.createElement('canvas');
-          // Keep aspect ratio, fit within square, letterbox with transparent bg
-          const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
-          const w = Math.round(img.width * scale);
-          const h = Math.round(img.height * scale);
-          canvas.width = maxSize;
-          canvas.height = maxSize;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#0b111a';
-          ctx.fillRect(0,0,maxSize,maxSize);
-          const dx = Math.round((maxSize - w)/2);
-          const dy = Math.round((maxSize - h)/2);
-          ctx.drawImage(img, dx, dy, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.onerror = reject;
-        img.src = e.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  function loadFromLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('contactCardData'));
+    return data;
   }
 
-  function updatePreview(){
-    previewName.textContent = sanitize(fullName.value) || 'Your Name';
-    const uni = sanitize(university.value) || 'University';
-    const maj = sanitize(major.value) || 'Major';
-    const grd = sanitize(grade.value) || 'Grade';
-    previewMeta.textContent = `${uni} • ${maj} • ${grd}`;
+  function displayProfile(data) {
+    title.textContent = "My Contact Card";
+    form.style.display = 'none';
+    card.style.display = 'flex';
 
-    const li = sanitize(linkedin.value);
-    previewLinkedIn.href = li || '#';
-    previewLinkedIn.textContent = li || 'LinkedIn';
-
-    const em = sanitize(email.value) || 'you@example.com';
-    previewEmail.href = em ? `mailto:${em}` : '#';
-    previewEmail.textContent = em;
-
-    const ph = sanitize(phone.value) || '+1 555 123 4567';
-    previewPhone.textContent = ph;
-
-    const ints = sanitize(interests.value);
-    previewInterests.textContent = ints || 'Your interests appear here';
-    if (imageDataURL) previewAvatar.src = imageDataURL;
+    document.getElementById('cardPhoto').src = data.profilePic;
+    document.getElementById('cardName').textContent = data.fullName;
+    document.getElementById('cardUniversity').textContent = data.university;
+    document.getElementById('cardMajor').textContent = "Major: " + data.major;
+    document.getElementById('cardGradeLevel').textContent = "Grade Level: " + data.gradeLevel;
+    document.getElementById('cardInterests').textContent = "Interests: " + data.interests;
+    document.getElementById('cardLinkedIn').href = data.linkedin;
+    document.getElementById('cardLinkedIn').textContent = data.linkedin;
+    document.getElementById('cardPhone').textContent = data.phone;
+    document.getElementById('cardEmail').textContent = data.email;
+    document.getElementById('cardEmail').href = "mailto:" + data.email;
   }
 
-  ['input','change'].forEach(evt=>{
-    [fullName, university, major, grade, interests, email, phone, linkedin].forEach(el=>{
-      el.addEventListener(evt, updatePreview);
-    });
-  });
-
-  photoInput.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    photoName.textContent = `Selected: ${f.name} (${Math.round(f.size/1024)} KB)`;
-    try{
-      imageDataURL = await resizeImageToDataURL(f, 256, 0.75);
-      previewAvatar.src = imageDataURL;
-    }catch(err){ photoName.textContent = 'Could not read image.'; }
-  });
-
-  function validate(){
-    let ok = true;
-    Object.values(err).forEach(n=> n.textContent='');
-    if (!sanitize(fullName.value)){ err.name.textContent = 'Full name is required.'; ok=false; }
-    if (!sanitize(university.value)){ err.university.textContent = 'University is required.'; ok=false; }
-    if (!sanitize(major.value)){ err.major.textContent = 'Major is required.'; ok=false; }
-    if (!sanitize(grade.value)){ err.grade.textContent = 'Select a grade level.'; ok=false; }
-    const em = sanitize(email.value);
-    if (!em || !/^\S+@\S+\.\S+$/.test(em)){ err.email.textContent = 'Valid email required.'; ok=false; }
-    const ph = sanitize(phone.value);
-    if (!ph || ph.length < 7){ err.phone.textContent = 'Valid phone number required.'; ok=false; }
-    const li = sanitize(linkedin.value);
-    if (!li || !/^https?:\/\/(www\.)?linkedin\.com\/.+/i.test(li)){
-      err.linkedin.textContent = 'Provide a valid LinkedIn profile URL.'; ok=false;
-    }
-    return ok;
-  }
-
-  function buildProfile(){
-    return {
-      n: sanitize(fullName.value),
-      u: sanitize(university.value),
-      m: sanitize(major.value),
-      g: sanitize(grade.value),
-      i: sanitize(interests.value),
-      e: sanitize(email.value),
-      p: sanitize(phone.value),
-      l: sanitize(linkedin.value),
-      img: imageDataURL || ''
-    };
-  }
-
-  function toShareURL(profile){
-    const json = JSON.stringify(profile);
-    const payload = b64urlEncode(json);
-    const base = location.origin + location.pathname;
-    return `${base}#data=${payload}`;
-  }
-
-  function loadFromHash(){
-    const h = location.hash || '';
-    const m = h.match(/#data=([\w\-\_]+)/);
-    if (!m) return null;
-    try{
-      const json = b64urlDecode(m[1]);
-      const obj = JSON.parse(json);
-      return obj;
-    }catch(e){ return null; }
-  }
-
-  function enterEditMode(){
-    modeText.textContent = 'Edit';
-    editView.classList.remove('hidden');
-    readView.classList.add('hidden');
-  }
-
-  function enterReadMode(profile){
-    modeText.textContent = 'View';
-    editView.classList.add('hidden');
-    readView.classList.remove('hidden');
-
-    // Populate card
-    cardName.textContent = profile.n || '';
-    cardMeta.textContent = `${profile.u || ''} • ${profile.m || ''} • ${profile.g || ''}`;
-    cardLinkedIn.href = profile.l || '#';
-    cardLinkedIn.textContent = profile.l || 'LinkedIn';
-    cardEmail.href = profile.e ? `mailto:${profile.e}` : '#';
-    cardEmail.textContent = profile.e || 'Email';
-    cardPhone.textContent = profile.p || '';
-    cardInterests.textContent = profile.i || '';
-    if (profile.img){ cardAvatar.src = profile.img; } else { cardAvatar.removeAttribute('src'); }
-
-    // security: ensure no query params are interpreted; we only read hash
-    // page contains no inputs in view mode → non-editable.
-  }
-
-  function buildVCard(p){
-    // Basic vCard 3.0
-    const esc = s => (s||'').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n');
-    let lines = [
-      'BEGIN:VCARD',
-      'VERSION:3.0',
-      `FN:${esc(p.n)}`,
-      `ORG:${esc(p.u)}`,
-      `TITLE:${esc(p.m)} (${esc(p.g)})`,
-      `EMAIL;TYPE=INTERNET:${esc(p.e)}`,
-      `TEL;TYPE=CELL:${esc(p.p)}`,
-      `URL:${esc(p.l)}`
-    ];
-    if (p.i) lines.push(`NOTE:Interests - ${esc(p.i)}`);
-    lines.push('END:VCARD');
-    return lines.join('\r\n');
-  }
-
-  generateBtn.addEventListener('click', (e)=>{
+  form.addEventListener('submit', function(e) {
     e.preventDefault();
-    if (!validate()) return;
-    const profile = buildProfile();
-    const url = toShareURL(profile);
-    // Navigate immediately to view-only for UX confirmation
-    location.replace(url);
-  });
 
-  clearBtn.addEventListener('click', ()=>{
-    [fullName, university, major, interests, email, phone, linkedin].forEach(el=> el.value='');
-    grade.value='';
-    imageDataURL='';
-    previewAvatar.removeAttribute('src');
-    updatePreview();
-    Object.values(err).forEach(n=> n.textContent='');
-    photoName.textContent='';
-  });
+    const reader = new FileReader();
+    const file = document.getElementById('profilePic').files[0];
 
-  copyLinkBtn.addEventListener('click', async ()=>{
-    try{
-      await navigator.clipboard.writeText(location.href);
-      copyStatus.textContent = 'Link copied to clipboard.';
-      copyStatus.className = 'hint success';
-      setTimeout(()=>{ copyStatus.textContent=''; }, 2000);
-    }catch(e){
-      copyStatus.textContent = 'Could not copy link.';
-      copyStatus.className = 'hint error';
+    reader.onloadend = function() {
+      const data = {
+        profilePic: reader.result,
+        fullName: document.getElementById('fullName').value,
+        university: document.getElementById('university').value,
+        major: document.getElementById('major').value,
+        gradeLevel: document.getElementById('gradeLevel').value,
+        interests: document.getElementById('interests').value,
+        linkedin: document.getElementById('linkedin').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value
+      };
+      saveToLocalStorage(data);
+      displayProfile(data);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
     }
   });
 
-  downloadVcfBtn.addEventListener('click', ()=>{
-    const data = loadFromHash();
-    if (!data) return;
-    const vcf = buildVCard(data);
-    const blob = new Blob([vcf], {type:'text/vcard;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `${(data.n||'contact').replace(/\s+/g,'_')}.vcf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
-
-  // Initialize
-  const profile = loadFromHash();
-  if (profile){ enterReadMode(profile); }
-  else { enterEditMode(); updatePreview(); }
-
-  // If hash changes (e.g., navigation), switch modes accordingly
-  window.addEventListener('hashchange', ()=>{
-    const p = loadFromHash();
-    if (p) enterReadMode(p); else enterEditMode();
-  });
-
-})();
+  window.onload = function() {
+    const data = loadFromLocalStorage();
+    if (data) {
+      displayProfile(data);
+    }
+  };
 </script>
+
 </body>
 </html>
+
