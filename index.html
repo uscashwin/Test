@@ -1,257 +1,305 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Virtual Business Card (URL ≤ 428 chars)</title>
-<style>
-  :root { color-scheme: light dark; }
-  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 24px; }
-  .wrap { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 1.25rem; margin: 0 0 12px; }
-  fieldset { border: 1px solid #8884; border-radius: 10px; padding: 16px; margin: 0 0 16px; }
-  label { display: block; font-size: .9rem; margin: 10px 0 4px; opacity: .85; }
-  input, textarea { width: 100%; padding: 10px; border: 1px solid #9995; border-radius: 8px; font: inherit; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .btns { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 0; }
-  button { padding: 10px 14px; border-radius: 8px; border: 1px solid #0000; cursor: pointer; font: inherit; }
-  .primary { background: #2563eb; color: white; }
-  .secondary { background: #e5e7eb; }
-  .urlbox { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9rem; padding: 10px; border: 1px dashed #8886; border-radius: 8px; word-break: break-all; background: #00000007; }
-  .muted { opacity: .75; font-size: .9rem; }
-  .danger { color: #b91c1c; font-weight: 600; }
-  .card { border: 1px solid #8884; border-radius: 14px; padding: 18px; display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; }
-  .avatar { width: 96px; height: 96px; border-radius: 12px; object-fit: cover; background: #ddd; }
-  .title { font-size: 1.25rem; margin: 0 0 4px; }
-  .sub { margin: 2px 0; }
-  .links a { text-decoration: none; color: #2563eb; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .8rem; background: #00000010; margin: 2px 6px 2px 0; }
-  .hidden { display:none; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NFC Contact Link • Generator & Viewer</title>
+  <meta name="description" content="Create a compact NFC URL that renders a view-only contact card." />
+  <style>
+    :root{
+      --bg: #0b0f14; --card:#121821; --muted:#7b8794; --text:#e6edf3; --accent:#4cc9f0; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444; --border:#263041;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial; background:linear-gradient(180deg,#0b0f14,#0a0d11); color:var(--text); min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px}
+    .wrap{width:100%; max-width:980px}
+    .card{background:linear-gradient(180deg,#121821,#0f141c); border:1px solid var(--border); border-radius:20px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{margin:0 0 8px; font-size:1.6rem; letter-spacing:.3px}
+    p.sub{margin:0 0 20px; color:var(--muted)}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .grid-1{grid-template-columns:1fr}
+    label{display:block; font-size:.9rem; color:#b7c2cc; margin:8px 0 6px}
+    input, textarea{width:100%; border:1px solid var(--border); background:#0c1117; color:var(--text); padding:12px 14px; border-radius:12px; outline:none}
+    input:focus, textarea:focus{border-color:#334155; box-shadow:0 0 0 3px rgba(76,201,240,.15)}
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    button{background:var(--accent); color:#05141f; border:0; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer}
+    button.secondary{background:#17202b; color:#cfe8ff; border:1px solid var(--border)}
+    .out{margin-top:16px; padding:12px; border:1px dashed var(--border); border-radius:12px; word-break:break-all; background:#0a0f15}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background:#0f1722; border:1px solid var(--border); color:#bcd0e0; font-size:.85rem}
+    .pill.ok{border-color:#1f5130; color:#86efac; background:#0e1a12}
+    .pill.warn{border-color:#5b440f; color:#facc15; background:#161206}
+    .pill.err{border-color:#5b1b1b; color:#fca5a5; background:#170b0b}
+    .split{display:grid; grid-template-columns: 260px 1fr; gap:20px}
+    .viewer{display:flex; gap:16px; align-items:stretch}
+    .avatar{width:220px; min-width:220px; aspect-ratio:1/1; border-radius:16px; background:#0a0f15 center/cover no-repeat; border:1px solid var(--border)}
+    .vcard{padding:4px}
+    .vrow{display:flex; align-items:center; gap:10px; margin:8px 0; color:#d7e0ea}
+    .k{width:110px; color:#9fb0c1}
+    a{color:#7dd3fc; text-decoration:none}
+    a:hover{text-decoration:underline}
+    .footer{margin-top:16px; color:#9fb0c1}
+    .hide{display:none !important}
+    .small{font-size:.9rem}
+    @media (max-width:900px){ .split{grid-template-columns:1fr} .viewer{flex-direction:column} .avatar{width:100%; min-width:unset} }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div id="generator">
-    <h1>Virtual Business Card — URL Generator</h1>
-    <p class="muted">Keep inputs concise. The generated link must be ≤ <b>428</b> characters for your NFC tag.</p>
-    <fieldset>
-      <legend>Contact info</legend>
-      <label for="n">Full Name</label>
-      <input id="n" placeholder="Ada Lovelace" maxlength="80">
-      <div class="row">
-        <div>
-          <label for="p">Phone</label>
-          <input id="p" placeholder="+1 555 123 4567" maxlength="25">
-        </div>
-        <div>
-          <label for="e">Email</label>
-          <input id="e" placeholder="ada@example.com" maxlength="100">
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label for="u">University (short)</label>
-          <input id="u" placeholder="USC" maxlength="40">
-        </div>
-        <div>
-          <label for="m">Major (short)</label>
-          <input id="m" placeholder="Aero" maxlength="40">
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label for="g">Level</label>
-          <input id="g" placeholder="M.S., 1st year" maxlength="40">
-        </div>
-        <div>
-          <label for="l">LinkedIn (username or short URL)</label>
-          <input id="l" placeholder="in/ada" maxlength="60">
-        </div>
-      </div>
-      <label for="i">Interests (comma-separated, keep short)</label>
-      <input id="i" placeholder="Propulsion, EDL systems, LLMs" maxlength="120">
-      <label for="a">Avatar Image URL (optional, keep short)</label>
-      <input id="a" placeholder="https://i.imgur.com/abc123.jpg" maxlength="120">
-      <div class="btns">
-        <button class="primary" id="gen">Generate URL</button>
-        <button class="secondary" id="copy">Copy URL</button>
-        <button class="secondary" id="preview">Preview Card</button>
-      </div>
-    </fieldset>
-    <div class="muted">Base (keep short if you host this file):</div>
-    <input id="base" value="" />
-    <p class="muted" id="hint"></p>
-    <div id="out" class="urlbox">Generated URL will appear here…</div>
-    <p id="len" class="muted">Length: 0</p>
-    <p id="warn" class="danger hidden">⚠️ URL exceeds 428 characters. Shorten your inputs.</p>
-    <p class="muted">How it works: we pack your data with short keys then compress to URL-safe text in <code>#hash</code>. Opening the link renders the contact card; no server needed.</p>
-  </div>
-
-  <div id="viewer" class="hidden">
+  <div class="wrap">
     <div class="card">
-      <img id="v_avatar" class="avatar" alt="">
-      <div>
-        <div class="title" id="v_name"></div>
-        <div class="sub" id="v_uni"></div>
-        <div class="sub" id="v_major"></div>
-        <div class="sub" id="v_level"></div>
-        <div class="sub" id="v_phone"></div>
-        <div class="sub" id="v_email"></div>
-        <div class="links" id="v_linkedin"></div>
-        <div id="v_interests" style="margin-top:6px;"></div>
+      <div id="generator">
+        <h1>NFC Contact URL Generator</h1>
+        <p class="sub">Enter your details. We’ll produce a compact, URL-safe link (&lt; 482 chars) that opens a <strong>view-only</strong> contact card.</p>
+
+        <div class="grid">
+          <div>
+            <label for="u">Profile Image URL (optional)</label>
+            <input id="u" placeholder="https://... (use a short image URL)" />
+          </div>
+          <div>
+            <label for="n">Full Name</label>
+            <input id="n" placeholder="Ada Lovelace" />
+          </div>
+          <div>
+            <label for="ph">Phone</label>
+            <input id="ph" placeholder="+1 555 867 5309" />
+          </div>
+          <div>
+            <label for="em">Email</label>
+            <input id="em" placeholder="ada@example.com" />
+          </div>
+          <div class="grid-1">
+            <label for="li">LinkedIn</label>
+            <input id="li" placeholder="linkedin.com/in/your-handle (short is best)" />
+          </div>
+          <div class="grid-1">
+            <label for="in">Interests (comma-separated, optional)</label>
+            <input id="in" placeholder="Propulsion, Avionics, CFD" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:16px">
+          <button id="gen">Generate URL</button>
+          <button id="clear" class="secondary">Clear</button>
+          <span id="lenpill" class="pill">Length: <strong id="urllen">0</strong> chars</span>
+        </div>
+
+        <div id="out" class="out hide"></div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="copy" class="secondary hide">Copy URL</button>
+          <button id="open" class="secondary hide">Open Preview</button>
+        </div>
+
+        <p class="footer small">Tip: To keep the URL under 482 characters, prefer a short LinkedIn handle and a concise Interests list.</p>
+      </div>
+
+      <div id="viewer" class="hide">
+        <h1>Contact Card</h1>
+        <p class="sub">View-only</p>
+        <div class="split">
+          <div class="avatar" id="av"></div>
+          <div class="vcard" id="vc">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+        <div class="row" style="margin-top:16px">
+          <a id="backlink" class="pill" href="./">← Create your own</a>
+        </div>
       </div>
     </div>
-    <p class="muted" style="margin-top:10px;"><a href="#" onclick="location.hash=''; location.reload()">Create your own</a></p>
   </div>
-</div>
 
-<script>
-/* Minimal LZ-based URI-safe compressor (subset of lz-string: compressToEncodedURIComponent / decompressFromEncodedURIComponent)
-   Source: https://github.com/pieroxy/lz-string (MIT). Trimmed to necessary functions. */
-var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},e={compressToEncodedURIComponent:function(o){return null==o?"":e._compress(o,6,function(o){return n.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:e._decompress(r.length,32,function(t){return o(n,r.charAt(t))})},_compress:function(o,n,t){if(null==o)return"";var e,i,a={},p={},s="",u="",c="",l=2,f=3,d=2,h=[],m=0,v=0;for(i=0;i<o.length;i+=1)if(s=o.charAt(i),Object.prototype.hasOwnProperty.call(a,s)||(a[s]=f++,p[s]=!0),u=c+s,Object.prototype.hasOwnProperty.call(a,u))c=u;else{if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<d;e++)m<<=1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<8;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}else{for(e=0;e<d;e++)m=m<<1|1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<16;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}l--,0==l&&(l=Math.pow(2,d),d++),delete p[c]}else{for(i=0;i<d;i++)m=m<<1,v==n-1?(v=0,h.push(t(m)),m=0):v++;l--,0==l&&(l=Math.pow(2,d),d++),h.push(t(a[c]))}l--,0==l&&(l=Math.pow(2,d),d++),a[u]=f++,c=String(s)}if(""!==c){if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<d;e++)m<<=1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<8;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}else{for(e=0;e<d;e++)m=m<<1|1,v==n-1?(v=0,h.push(t(m)),m=0):v++;for(i=0;i<16;i++)m=m<<1|1&c.charCodeAt(0)>>i,v==n-1?(v=0,h.push(t(m)),m=0):v++}l--,0==l&&(l=Math.pow(2,d),d++),delete p[c]}else{for(i=0;i<d;i++)m=m<<1,v==n-1?(v=0,h.push(t(m)),m=0):v++;h.push(t(a[c]))}}for(;;){if(m<<=1,v==n-1){h.push(t(m));break}v++}return h.join("")},_decompress:function(o,n,t){var e,i,a,p,s,u,c,l,f=[],d=4,h=4,m=3,v="",w=[],A={val:t(0),position:n,index:1};for(i=0;i<3;i+=1)f[i]=i;for(p=0,s=Math.pow(2,2),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1;switch(e=p){case 0:for(p=0,s=Math.pow(2,8),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; c=r(p);break;case 1:for(p=0,s=Math.pow(2,16),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; c=r(p);break;case 2:return""}f[3]=c,l=c,w.push(c);for(;A.index<=o;){for(p=0,s=Math.pow(2,m),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1;switch(c=p){case 0:for(p=0,s=Math.pow(2,8),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; f[h++]=r(p),c=h-1,m--;break;case 1:for(p=0,s=Math.pow(2,16),u=1;u!=s;)a=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=t(A.index++)),p|=(a>0?1:0)*u,u<<=1; f[h++]=r(p),c=h-1,m--;break;case 2:return w.join("")}if(0==m&&(m=Math.pow(2,++v),v=0),f[c])i=f[c];else{if(c!==h)return null;i=l+l.charAt(0)}w.push(i),f[h++]=l+i.charAt(0),l=i; if(0==--m&&(m=Math.pow(2,++v),v=0));}return w.join("")}};return e}();
+  <!-- LZ-String (minimal build: compressToEncodedURIComponent / decompressFromEncodedURIComponent) -->
+  <script>
+  /* LZ-String 1.4.4 (URL-encoded only) – https://github.com/pieroxy/lz-string – MIT
+     Trimmed to only the two functions we use to keep things light. */
+  var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},e={compressToEncodedURIComponent:function(o){return null==o?"":e._compress(o,6,function(o){return n.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:e._decompress(r.length,32,function(t){return o(n,r.charAt(t))})},_compress:function(o,n,t){if(null==o)return"";var e,i,u,s={},a={},c="",p="",l="",f=2,h=3,d=2,v=[],g=0,m=0;for(i=0;i<o.length;i+=1)if(c=o.charAt(i),Object.prototype.hasOwnProperty.call(s,c)||(s[c]=h++,a[c]=!0),p=l+c,Object.prototype.hasOwnProperty.call(s,p))l=p;else{if(Object.prototype.hasOwnProperty.call(a,l)){if(l.charCodeAt(0)<256){for(e=0;e<d;e++)g<<=1,m==n-1?(m=0,v.push(t(g)),g=0):m++;for(u=l.charCodeAt(0),e=0;e<8;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}else{for(u=1,e=0;e<d;e++)g=g<<1|u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u=0;for(u=l.charCodeAt(0),e=0;e<16;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}f--,0==f&&(f=Math.pow(2,d),d++),delete a[l]}else for(u=s[l],e=0;e<d;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1;f--,0==f&&(f=Math.pow(2,d),d++),s[p]=h++,l=String(c)}if(""!==l){if(Object.prototype.hasOwnProperty.call(a,l)){if(l.charCodeAt(0)<256){for(e=0;e<d;e++)g<<=1,m==n-1?(m=0,v.push(t(g)),g=0):m++;for(u=l.charCodeAt(0),e=0;e<8;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}else{for(u=1,e=0;e<d;e++)g=g<<1|u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u=0;for(u=l.charCodeAt(0),e=0;e<16;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1}f--,0==f&&(f=Math.pow(2,d),d++),delete a[l]}else for(u=s[l],e=0;e<d;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1;f--,0==f&&(f=Math.pow(2,d),d++)}for(u=2,e=0;e<d;e++)g=g<<1|1&u,m==n-1?(m=0,v.push(t(g)),g=0):m++,u>>=1;for(;;){if(g<<=1,m==n-1){v.push(t(g));break}m++}return v.join("")},_decompress:function(o,n,t){var e,i,u,s,a,c,p,l,f,h=[],d=4,v=4,g=3,m="",w=[],C={val:t(0),position:n,index:1};for(i=0;i<3;i+=1)h[i]=i;for(a=0,c=Math.pow(2,2),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;switch(a){case 0:for(a=0,c=Math.pow(2,8),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;f=r(a);break;case 1:for(a=0,c=Math.pow(2,16),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;f=r(a);break;case 2:return""}for(h[3]=f,l=f,w.push(f);;){if(C.index>o)return"";for(a=0,c=Math.pow(2,g),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;switch(u=a){case 0:for(a=0,c=Math.pow(2,8),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;h[v++]=r(a),u=d-1,g=2;break;case 1:for(a=0,c=Math.pow(2,16),p=1;p!=c;)s=C.val&C.position,C.position>>=1,0==C.position&&(C.position=n,C.val=t(C.index++)),a|=(s>0?1:0)*p,p<<=1;h[v++]=r(a),u=d-1,g=2;break;case 2:return w.join("")}if(d=u+1, h[u])m=h[u];else{if(u!==v)return null;m=l+l.charAt(0)}w.push(m),h[v++]=l+m.charAt(0),l=m,0==--g&&(g=Math.pow(2,++e))}}
+  }();
+  </script>
 
-/* Utility: pick only filled fields and map to short keys */
-function packData() {
-  const get = id => document.getElementById(id).value.trim();
-  const raw = {
-    n: get('n'),  // name
-    p: get('p'),  // phone
-    e: get('e'),  // email
-    l: get('l'),  // linkedin (user or short url)
-    u: get('u'),  // university
-    m: get('m'),  // major
-    g: get('g'),  // grade/level
-    i: get('i'),  // interests
-    a: get('a')   // avatar url
-  };
-  // drop empty fields
-  const packed = {};
-  for (const k in raw) if (raw[k]) packed[k] = raw[k];
-  return packed;
-}
+  <script>
+    // Short keys to reduce payload size:
+    // u = image URL, n = name, ph = phone, em = email, in = interests, li = LinkedIn
+    const $ = sel => document.querySelector(sel);
+    const qs = new URLSearchParams(location.search);
+    const MAX_URL = 482;
 
-function buildURL() {
-  const baseInput = document.getElementById('base');
-  let base = baseInput.value.trim();
-  if (!base) {
-    // default to the current file (shortened to origin + path without query/hash)
-    const u = new URL(location.href);
-    u.search = '';
-    u.hash = '';
-    base = u.href.replace(/^file:\/\//,''); // keep short; user can replace with their hosted short path
-    baseInput.value = base;
-    document.getElementById('hint').textContent = "Tip: host this file at a short path (e.g., https://x.y/bc) to save characters.";
-  }
-  const packed = packData();
-  const json = JSON.stringify(packed);
-  const hash = LZString.compressToEncodedURIComponent(json);
-  const url = base + '#' + hash;
-  return url;
-}
-
-function showURL() {
-  const url = buildURL();
-  const out = document.getElementById('out');
-  const len = document.getElementById('len');
-  const warn = document.getElementById('warn');
-  out.textContent = url;
-  len.textContent = 'Length: ' + url.length;
-  if (url.length > 428) warn.classList.remove('hidden'); else warn.classList.add('hidden');
-}
-
-function copyURL() {
-  const txt = document.getElementById('out').textContent.trim();
-  if (!txt) return;
-  navigator.clipboard.writeText(txt).then(()=> {
-    alert('URL copied to clipboard.');
-  }, ()=> {
-    // fallback
-    const ta = document.createElement('textarea');
-    ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-    alert('URL copied to clipboard.');
-  });
-}
-
-function previewCard() {
-  const url = buildURL();
-  location.hash = url.split('#')[1] || '';
-  renderView();
-}
-
-/* Viewer mode */
-function renderView() {
-  const hash = location.hash.slice(1);
-  if (!hash) return;
-  // swap UI
-  document.getElementById('generator').classList.add('hidden');
-  document.getElementById('viewer').classList.remove('hidden');
-  // parse
-  let data = {};
-  try {
-    const json = LZString.decompressFromEncodedURIComponent(hash);
-    data = JSON.parse(json || '{}');
-  } catch(e) { data = {}; }
-  // fill
-  const avatar = document.getElementById('v_avatar');
-  const name = document.getElementById('v_name');
-  const uni  = document.getElementById('v_uni');
-  const major= document.getElementById('v_major');
-  const level= document.getElementById('v_level');
-  const phone= document.getElementById('v_phone');
-  const email= document.getElementById('v_email');
-  const li   = document.getElementById('v_linkedin');
-  const ints = document.getElementById('v_interests');
-
-  function set(el, txt, prefix='') {
-    if (txt) { el.textContent = prefix + txt; el.style.display='block'; }
-    else { el.textContent=''; el.style.display='none'; }
-  }
-
-  if (data.a) { avatar.src = data.a; avatar.alt = data.n ? data.n : 'avatar'; }
-  else { avatar.src = ''; avatar.alt = 'avatar'; }
-
-  set(name, data.n || ''); 
-  set(uni, data.u || '');
-  set(major, data.m ? 'Major: ' + data.m : '');
-  set(level, data.g ? 'Level: ' + data.g : '');
-  set(phone, data.p ? 'Phone: ' + data.p : '');
-  set(email, data.e ? 'Email: ' + data.e : '');
-
-  li.innerHTML = '';
-  if (data.l) {
-    let href = data.l;
-    if (!/^https?:\/\//i.test(href)) {
-      href = 'https://www.linkedin.com/' + href.replace(/^\/+/, '');
+    function sanitize(v){ return (v||"").trim(); }
+    function compactPayload(data){
+      // Remove empties, keep order stable
+      const o = {};
+      if (data.u) o.u = data.u;
+      if (data.n) o.n = data.n;
+      if (data.ph) o.ph = data.ph;
+      if (data.em) o.em = data.em;
+      if (data.in) o.in = data.in;
+      if (data.li) o.li = data.li;
+      return o;
     }
-    const a = document.createElement('a');
-    a.href = href; a.target = '_blank'; a.rel = 'noopener';
-    a.textContent = 'LinkedIn';
-    li.appendChild(a);
-  }
+    function encodeData(o){
+      const json = JSON.stringify(o);
+      return LZString.compressToEncodedURIComponent(json);
+    }
+    function decodeData(s){
+      const json = LZString.decompressFromEncodedURIComponent(s);
+      return JSON.parse(json);
+    }
+    function buildURL(enc){
+      // Use relative path to keep it short; when copied it’ll be absolute.
+      const base = location.origin + location.pathname;
+      return `${base}?d=${enc}`;
+    }
+    function setLenPill(len){
+      const pill = $('#lenpill');
+      const el = $('#urllen');
+      el.textContent = len;
+      pill.classList.remove('ok','warn','err');
+      if (len === 0) return;
+      if (len <= MAX_URL) pill.classList.add('ok');
+      else if (len <= MAX_URL + 60) pill.classList.add('warn');
+      else pill.classList.add('err');
+    }
+    function validateBasic(){
+      const em = sanitize($('#em').value);
+      const li = sanitize($('#li').value);
+      const u  = sanitize($('#u').value);
+      if (em && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return {ok:false,msg:'Invalid email format.'};
+      if (li && !/^https?:\/\/|^([a-z0-9.-]+\.[a-z]{2,})|^linkedin\.com\//i.test(li)) return {ok:false,msg:'LinkedIn should be a URL or handle.'};
+      if (u && !/^https?:\/\//i.test(u)) return {ok:false,msg:'Profile image must be a URL starting with http(s)://'};
+      return {ok:true};
+    }
+    function renderViewer(data){
+      const v = $('#viewer'), g = $('#generator');
+      g.classList.add('hide'); v.classList.remove('hide');
+      const av = $('#av');
+      if (data.u) av.style.backgroundImage = `url("${data.u}")`;
+      else av.style.backgroundImage = 'linear-gradient(135deg,#0d1320,#0a0f15)';
+      const vc = $('#vc');
+      vc.innerHTML = '';
+      function row(label, value, isLink){
+        if (!value) return;
+        const div = document.createElement('div');
+        div.className = 'vrow';
+        const k = document.createElement('div');
+        k.className='k'; k.textContent = label;
+        const v = document.createElement('div');
+        if (isLink){
+          const a = document.createElement('a');
+          a.href = value.startsWith('http') ? value : ('https://' + value.replace(/^\/\//,''));
+          a.target = '_blank'; a.rel='noopener';
+          a.textContent = value;
+          v.appendChild(a);
+        } else {
+          v.textContent = value;
+        }
+        div.appendChild(k); div.appendChild(v);
+        vc.appendChild(div);
+      }
+      row('Full Name', data.n);
+      row('Phone', data.ph);
+      row('Email', data.em ? data.em : '');
+      if (data.em){
+        // Make email link
+        const last = vc.lastElementChild?.lastElementChild;
+        if (last) { last.innerHTML = `<a href="mailto:${data.em}">${data.em}</a>`; }
+      }
+      row('Interests', data.in);
+      row('LinkedIn', data.li, true);
+    }
+    function renderGenerator(){
+      $('#viewer').classList.add('hide');
+      $('#generator').classList.remove('hide');
+    }
 
-  ints.innerHTML = '';
-  if (data.i) {
-    data.i.split(',').map(s=>s.trim()).filter(Boolean).slice(0,12).forEach(tag=>{
-      const b = document.createElement('span');
-      b.className = 'badge'; b.textContent = tag;
-      ints.appendChild(b);
+    // Mode switch on load
+    (function init(){
+      const d = qs.get('d');
+      if (d){
+        try {
+          const data = decodeData(d);
+          renderViewer(data);
+          return;
+        } catch(e){
+          // If decoding fails, fall back to generator with an error hint
+          renderGenerator();
+          const out = $('#out');
+          out.classList.remove('hide');
+          out.innerHTML = `<span class="pill err">Could not read contact data from URL.</span>`;
+        }
+      } else {
+        renderGenerator();
+      }
+    })();
+
+    // Live length indicator as fields change
+    ['u','n','ph','em','in','li'].forEach(id=>{
+      const el = document.getElementById(id);
+      el?.addEventListener('input', ()=>{
+        const chk = validateBasic();
+        const data = compactPayload({
+          u:sanitize($('#u').value),
+          n:sanitize($('#n').value),
+          ph:sanitize($('#ph').value),
+          em:sanitize($('#em').value),
+          in:sanitize($('#in').value),
+          li:sanitize($('#li').value),
+        });
+        try {
+          const enc = encodeData(data);
+          const url = buildURL(enc);
+          setLenPill(url.length);
+        } catch {
+          setLenPill(0);
+        }
+      });
     });
-  }
-}
 
-/* wire up */
-document.getElementById('gen').addEventListener('click', showURL);
-document.getElementById('copy').addEventListener('click', copyURL);
-document.getElementById('preview').addEventListener('click', previewCard);
-['n','p','e','l','u','m','g','i','a','base'].forEach(id=>{
-  const el = document.getElementById(id);
-  el && el.addEventListener('input', ()=> { /* live update on edit after first generate */ });
-});
+    // Generate
+    $('#gen').addEventListener('click', ()=>{
+      const val = validateBasic();
+      const out = $('#out'); const copyBtn = $('#copy'); const openBtn = $('#open');
+      if (!val.ok){
+        out.classList.remove('hide');
+        out.innerHTML = `<span class="pill err">${val.msg}</span>`;
+        copyBtn.classList.add('hide'); openBtn.classList.add('hide');
+        return;
+      }
+      const data = compactPayload({
+        u:sanitize($('#u').value),
+        n:sanitize($('#n').value),
+        ph:sanitize($('#ph').value),
+        em:sanitize($('#em').value),
+        in:sanitize($('#in').value),
+        li:sanitize($('#li').value),
+      });
+      const enc = encodeData(data);
+      const url = buildURL(enc);
+      setLenPill(url.length);
+      let status = '';
+      if (url.length <= MAX_URL) status = `<span class="pill ok">OK for NFC (≤ ${MAX_URL})</span>`;
+      else status = `<span class="pill warn">Over ${MAX_URL} chars — shorten optional fields</span>`;
+      out.classList.remove('hide');
+      out.innerHTML = `${status}<div style="margin-top:8px"></div><strong>URL:</strong><br>${url}`;
+      copyBtn.classList.remove('hide'); openBtn.classList.remove('hide');
+      copyBtn.onclick = async ()=>{
+        try { await navigator.clipboard.writeText(url);
+          copyBtn.textContent = 'Copied!';
+          setTimeout(()=>copyBtn.textContent='Copy URL',1200);
+        } catch(e){
+          alert('Copy failed. Please select and copy manually.');
+        }
+      };
+      openBtn.onclick = ()=> window.open(url, '_blank', 'noopener');
+    });
 
-if (location.hash) {
-  renderView();
-}
-</script>
+    // Clear
+    $('#clear').addEventListener('click', ()=>{
+      ['u','n','ph','em','in','li'].forEach(id=>{ const el = document.getElementById(id); if (el) el.value=''; });
+      $('#out').classList.add('hide');
+      $('#copy').classList.add('hide');
+      $('#open').classList.add('hide');
+      setLenPill(0);
+    });
+  </script>
 </body>
 </html>
 
